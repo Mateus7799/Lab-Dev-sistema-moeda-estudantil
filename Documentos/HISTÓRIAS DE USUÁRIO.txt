@@ -1,0 +1,36 @@
+HISTÓRIAS DE USUÁRIO
+
+US01 - Aluno
+Descrição: Quero me cadastrar com meus dados e escolher minha instituição para participar do sistema.
+Critérios:
+- Preencher todos os dados obrigatórios (CPF, RG, endereço, etc.).
+- Selecionar uma instituição que já esteja pré-cadastrada no sistema.
+
+US02 - Professor
+Descrição: Quero enviar moedas para os alunos como reconhecimento por bom desempenho.
+Critérios:
+- Possuir saldo disponível para a transação.
+- Escrever obrigatoriamente o motivo do envio (mensagem aberta).
+- O saldo não utilizado acumula para o próximo semestre.
+
+US03 - Aluno
+Descrição: Quero receber um aviso por e-mail quando ganhar moedas.
+Critérios:
+- O sistema deve disparar o e-mail automaticamente após a confirmação do professor.
+
+US04 - Usuário
+Descrição: Quero ver meu saldo e histórico de transações (extrato).
+Critérios:
+- Professores visualizam envios; Alunos visualizam recebimentos e trocas.
+- O saldo atual deve aparecer em destaque no extrato.
+
+US05 - Empresa Parceira
+Descrição: Quero me cadastrar e listar vantagens para os alunos.
+Critérios:
+- Cada vantagem deve conter nome, descrição, foto e valor em moedas.
+
+US06 - Aluno
+Descrição: Quero trocar minhas moedas por vantagens do catálogo.
+Critérios:
+- O sistema valida o saldo e realiza o desconto imediato.
+- Um e-mail com o código do cupom deve ser enviado ao aluno e outro à empresa.

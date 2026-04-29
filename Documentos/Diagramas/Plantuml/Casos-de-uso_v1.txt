@@ -1,0 +1,47 @@
+@startuml
+skinparam actorStyle awesome
+left to right direction
+
+' Atores
+actor "Usuário" as User
+package "Usuários do Sistema" {
+    actor "Aluno" as Alun
+    actor "Professor" as Prof
+    actor "Empresa Parceira" as Emp
+}
+
+Alun -left-|> User
+Prof -left-|> User
+Emp -left-|> User
+
+rectangle "Sistema de Moeda Estudantil" {
+    
+    (Efetuar Login) as UC_Login
+    (Cadastrar Aluno) as UC_CadAlun
+    (Cadastrar Empresa) as UC_CadEmp
+    (Consultar Extrato) as UC_Extrato
+    (Distribuir Moedas) as UC_Doar
+    (Resgatar Vantagem) as UC_Resgate
+    (Gerenciar Vantagens) as UC_Vantagens
+
+    ' Relações de Acesso
+    User --> UC_Login
+    Alun --> UC_CadAlun
+    Emp --> UC_CadEmp
+    
+    ' Inclusões
+    UC_Extrato ..> UC_Login : <<include>>
+    UC_Doar ..> UC_Login : <<include>>
+    UC_Resgate ..> UC_Login : <<include>>
+    UC_Vantagens ..> UC_Login : <<include>>
+    
+    ' Links diretores por ator
+    Alun --> UC_Extrato
+    Alun --> UC_Resgate
+    
+    Prof --> UC_Doar
+    Prof --> UC_Extrato
+    
+    Emp --> UC_Vantagens
+}
+@enduml
