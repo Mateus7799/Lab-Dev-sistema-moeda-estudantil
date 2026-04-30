@@ -40,3 +40,21 @@ Descrição: Quero fazer login no sistema para acessar minha conta.
 Critérios:
 - O sistema deve validar o e-mail e a senha cadastrados para liberar o acesso.
 - Um e-mail com o código do cupom deve ser enviado ao aluno e outro à empresa.
+
+US08 - Aluno e Professor
+Descrição: Quero filtrar meu extrato por período para encontrar transações específicas.
+Critérios:
+- O usuário deve poder definir uma data de início e fim para a consulta.
+- O sistema deve exibir apenas os resultados dentro do intervalo selecionado.
+
+US09 - Empresa Parceira
+Descrição: Quero anexar fotos às vantagens cadastradas para torná-las mais atrativas.
+Critérios:
+- O sistema deve permitir o upload de arquivos de imagem no cadastro da vantagem.
+- A imagem deve ser exibida corretamente no catálogo de vantagens do aluno.
+
+US10 - Instituição
+Descrição: Quero pré-cadastrar os professores da minha instituição no sistema.
+Critérios:
+- A instituição deve fornecer nome, CPF e departamento do professor.
+- Após o cadastro, o professor deve estar apto a receber seu saldo semestral de moedas.
