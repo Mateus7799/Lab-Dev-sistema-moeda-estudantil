@@ -58,3 +58,8 @@ Descrição: Quero pré-cadastrar os professores da minha instituição no siste
 Critérios:
 - A instituição deve fornecer nome, CPF e departamento do professor.
 - Após o cadastro, o professor deve estar apto a receber seu saldo semestral de moedas.
+
+US11 - Aluno e Empresa
+Descrição: Quero pesquisar por vantagens específicas no catálogo.
+Critérios:
+- O sistema deve permitir a busca por nome ou categoria da vantagem.
