@@ -37,13 +37,17 @@ function Empresas() {
 
       <button onClick={() => setOpen(true)}>+ Nova Empresa</button>
 
-      <ul className="lista">
-        {empresas.map(e => (
-          <li key={e.id}>
-            <strong>{e.nome}</strong> — {e.email}
-          </li>
+      <div className="card-container">
+        {empresas.map((e) => (
+          <div className="card" key={e.id}>
+            <h3>{e.nome}</h3>
+
+            <p><strong>Email:</strong> {e.email}</p>
+            <p><strong>CNPJ:</strong> {e.cnpj}</p>
+            <p><strong>Descrição:</strong> {e.descricao}</p>
+          </div>
         ))}
-      </ul>
+      </div>
 
       <Modal isOpen={open} onClose={() => setOpen(false)}>
         <h2>Cadastrar Empresa</h2>

@@ -11,7 +11,7 @@ function Alunos() {
     nome: "",
     email: "",
     cpf: "",
-    curso: ""
+    curso: "",
   });
 
   useEffect(() => {
@@ -19,7 +19,7 @@ function Alunos() {
   }, []);
 
   const carregar = () => {
-    getAlunos().then(res => setAlunos(res.data));
+    getAlunos().then((res) => setAlunos(res.data));
   };
 
   const handleSubmit = (e) => {
@@ -37,20 +37,47 @@ function Alunos() {
 
       <button onClick={() => setOpen(true)}>+ Novo Aluno</button>
 
-      <ul>
-        {alunos.map(a => (
-          <li key={a.id}>{a.nome} - {a.curso}</li>
+      <div className="card-container">
+        {alunos.map((a) => (
+          <div className="card" key={a.id}>
+            <h3>{a.nome}</h3>
+
+            <p>
+              <strong>Email:</strong> {a.email}
+            </p>
+            <p>
+              <strong>CPF:</strong> {a.cpf}
+            </p>
+            <p>
+              <strong>Curso:</strong> {a.curso}
+            </p>
+            <p>
+              <strong>Saldo:</strong> {a.saldoMoedas ?? 0} moedas
+            </p>
+          </div>
         ))}
-      </ul>
+      </div>
 
       <Modal isOpen={open} onClose={() => setOpen(false)}>
         <h2>Cadastrar Aluno</h2>
 
         <form onSubmit={handleSubmit}>
-          <input placeholder="Nome" onChange={e => setForm({...form, nome: e.target.value})} />
-          <input placeholder="Email" onChange={e => setForm({...form, email: e.target.value})} />
-          <input placeholder="CPF" onChange={e => setForm({...form, cpf: e.target.value})} />
-          <input placeholder="Curso" onChange={e => setForm({...form, curso: e.target.value})} />
+          <input
+            placeholder="Nome"
+            onChange={(e) => setForm({ ...form, nome: e.target.value })}
+          />
+          <input
+            placeholder="Email"
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+          />
+          <input
+            placeholder="CPF"
+            onChange={(e) => setForm({ ...form, cpf: e.target.value })}
+          />
+          <input
+            placeholder="Curso"
+            onChange={(e) => setForm({ ...form, curso: e.target.value })}
+          />
 
           <button type="submit">Salvar</button>
         </form>

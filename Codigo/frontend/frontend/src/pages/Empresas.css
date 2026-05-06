@@ -1,26 +1,48 @@
 .page {
-  padding: 30px;
+  padding: 40px;
 }
 
 button {
-  background: #fbc02d;
-  color: black;
-  padding: 10px;
-  border: none;
-  margin-bottom: 20px;
+  background: transparent;
+  border: 2px solid #bb86fc;
+  color: #bb86fc;
+  padding: 10px 15px;
   cursor: pointer;
-  font-weight: bold;
+  transition: 0.2s;
+  margin-bottom: 20px;
 }
 
-.lista {
-  list-style: none;
-  padding: 0;
+button:hover {
+  background: #bb86fc;
+  color: black;
+  box-shadow: 0 0 10px #bb86fc;
 }
 
-.lista li {
-  background: white;
-  margin-bottom: 10px;
-  padding: 12px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: linear-gradient(145deg, #0f0f1a, #1a0033);
+  border: 1px solid #bb86fc;
+  border-radius: 15px;
+
+  padding: 20px;
+
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 0 20px #bb86fc;
+}
+
+.card h3 {
+  color: #bb86fc;
+}
+
+.card p {
+  margin: 5px 0;
 }
