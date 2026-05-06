@@ -1,23 +1,21 @@
-import { useEffect, useState } from "react";
-import { getAlunos } from "./api";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Header from "./components/Header";
+
+import Home from "./pages/Home";
+import Alunos from "./pages/Alunos";
+import Empresas from "./pages/Empresas";
 
 function App() {
-  const [alunos, setAlunos] = useState([]);
-
-  useEffect(() => {
-    getAlunos().then(res => {
-      console.log(res.data);
-      setAlunos(res.data);
-    });
-  }, []);
-
   return (
-    <div>
-      <h1>Lista de alunos</h1>
-      {alunos.map((a, i) => (
-        <p key={i}>{a.nome}</p>
-      ))}
-    </div>
+    <BrowserRouter>
+      <Header />
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/alunos" element={<Alunos />} />
+        <Route path="/empresas" element={<Empresas />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
