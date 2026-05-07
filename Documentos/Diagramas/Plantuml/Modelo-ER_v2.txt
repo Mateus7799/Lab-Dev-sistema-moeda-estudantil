@@ -1,0 +1,113 @@
+@startchen
+left to right direction
+
+<style>
+entity {
+  LineColor Black
+  BackgroundColor White
+}
+
+relationship {
+  LineColor Black
+  BackgroundColor White
+}
+</style>
+
+' ---------- ENTIDADES ----------
+
+entity "Usuário" as USUARIO {
+    id <<key>>
+    nome
+    email
+    senha
+    cpf <<key>>
+}
+
+entity "Aluno" as ALUNO {
+    rg
+    endereco
+    curso
+    saldo_moedas
+}
+
+entity "Professor" as PROFESSOR {
+    departamento
+    saldo_moedas
+}
+
+entity "Empresa" as EMPRESA {
+    cnpj <<key>>
+    descricao
+}
+
+entity "Instituição" as INSTITUICAO {
+    id <<key>>
+    nome
+}
+
+entity "Vantagem" as VANTAGEM {
+    id <<key>>
+    nome
+    descricao
+    foto_url
+    custo
+}
+
+entity "Transação" as TRANSACAO {
+    id <<key>>
+    valor
+    data
+    mensagem
+}
+
+' ---------- ESPECIALIZAÇÃO ----------
+
+relationship "Especialização" as ESP {
+}
+
+USUARIO -1- ESP
+ESP -N- ALUNO
+ESP -N- PROFESSOR
+ESP -N- EMPRESA
+
+' ---------- RELACIONAMENTOS ----------
+
+relationship "vinculado-a" as VINCULO {
+}
+
+relationship "estuda-em" as ESTUDA {
+}
+
+relationship "transfere" as ENVIA {
+}
+
+relationship "recebe" as RECEBE {
+}
+
+relationship "oferece" as OFERECE {
+}
+
+relationship "troca-por" as TROCA {
+}
+
+' ---------- CONEXÕES ----------
+
+PROFESSOR -N- VINCULO
+INSTITUICAO -1- VINCULO
+
+ALUNO -N- ESTUDA
+INSTITUICAO -1- ESTUDA
+
+PROFESSOR -1- ENVIA
+TRANSACAO -N- ENVIA
+
+TRANSACAO -N- RECEBE
+ALUNO -1- RECEBE
+
+EMPRESA -1- OFERECE
+VANTAGEM -N- OFERECE
+
+ALUNO -N- TROCA
+VANTAGEM -N- TROCA
+
+@endchen
