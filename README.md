@@ -32,12 +32,13 @@ O sistema foi projetado com foco em organização, modularidade e clareza estrut
 
 Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de Desenvolvimento de Software**, com o objetivo de aplicar na prática os conceitos estudados ao longo do curso.
 
-**Principais características:**
 
-- 
-- 
-- 
-- 
+## 📌 Principais características
+
+- Arquitetura Full Stack com React e Spring Boot
+- Integração entre frontend e backend via API REST
+- Persistência de dados utilizando PostgreSQL
+- Containerização da aplicação com Docker
 
 ---
 
@@ -51,7 +52,7 @@ Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de
 ![Classes](Documentos/Diagramas/Imagens/Diagrama-de-classes.png) 
 
 
-### Diagrama de Coponentes
+### Diagrama de Componentes
 ![Componentes](Documentos/Diagramas/Imagens/diagrama-componentes.png)
 
 
@@ -65,10 +66,10 @@ Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de
 
 ## ✨ Funcionalidades Principais
 
-- 
-- 
-- 
-- 
+- Cadastro e autenticação de usuários
+- Gerenciamento de alunos, instituições e empresas parceiras
+- Controle de vantagens e benefícios disponíveis
+- Dashboard com informações e funcionalidades específicas por perfil de usuário
 
 ---
 
@@ -83,27 +84,232 @@ Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de
 ## 📁 Estrutura do Projeto
 
 ```
-
+Lab-Dev-sistema-moeda-estudantil/
+│
+├── Codigo/
+│   │
+│   ├── backend/
+│   │   ├── pom.xml
+│   │   ├── .gitignore
+│   │   ├── data/
+│   │   │   └── moeda_db.mv.db
+│   │   │
+│   │   ├── src/main/
+│   │   │   ├── java/
+│   │   │   │   └── com/sistemamoedaestudantil/
+│   │   │   │       ├── config/
+│   │   │   │       │   └── CorsConfig.java
+│   │   │   │       │
+│   │   │   │       ├── controller/
+│   │   │   │       │   ├── AuthController.java
+│   │   │   │       │   ├── CadastroController.java
+│   │   │   │       │   ├── InstituicaoController.java
+│   │   │   │       │   └── VantagemController.java
+│   │   │   │       │
+│   │   │   │       ├── dto/
+│   │   │   │       │   ├── request/
+│   │   │   │       │   │   ├── CadastroAlunoRequest.java
+│   │   │   │       │   │   ├── CadastroEmpresaRequest.java
+│   │   │   │       │   │   ├── LoginRequest.java
+│   │   │   │       │   │   └── VantagemRequest.java
+│   │   │   │       │   │
+│   │   │   │       │   └── response/
+│   │   │   │       │       ├── UsuarioResponse.java
+│   │   │   │       │       └── VantagemResponse.java
+│   │   │   │       │
+│   │   │   │       ├── model/
+│   │   │   │       │   ├── Aluno.java
+│   │   │   │       │   ├── EmpresaParceira.java
+│   │   │   │       │   ├── Instituicao.java
+│   │   │   │       │   └── Vantagem.java
+│   │   │   │       │
+│   │   │   │       ├── repository/
+│   │   │   │       │   ├── AlunoRepository.java
+│   │   │   │       │   ├── EmpresaRepository.java
+│   │   │   │       │   ├── InstituicaoRepository.java
+│   │   │   │       │   └── VantagemRepository.java
+│   │   │   │       │
+│   │   │   │       ├── service/
+│   │   │   │       │   ├── AuthService.java
+│   │   │   │       │   ├── CadastroService.java
+│   │   │   │       │   ├── InstituicaoService.java
+│   │   │   │       │   └── VantagemService.java
+│   │   │   │       │
+│   │   │   │       └── SistemaMoedaEstudantilApplication.java
+│   │   │   │
+│   │   │   └── resources/
+│   │   │       ├── application.properties
+│   │   │       └── static/
+│   │   │
+│   │   └── target/                        
+│   │
+│   └── frontend/
+│       ├── package.json
+│       ├── package-lock.json
+│       ├── vite.config.ts
+│       ├── tailwind.config.js
+│       ├── tsconfig.json
+│       ├── eslint.config.js
+│       ├── postcss.config.js
+│       ├── index.html
+│       ├── .gitignore
+│       │
+│       ├── src/
+│       │   ├── main.tsx                     (entry point React)
+│       │   ├── App.tsx                      (rotas principais)
+│       │   ├── App.css
+│       │   ├── index.css
+│       │   │
+│       │   ├── assets/
+│       │   │
+│       │   ├── components/
+│       │   │   ├── Navbar.tsx
+│       │   │   ├── Sidebar.tsx
+│       │   │   ├── CardDashboard.tsx
+│       │   │   └── FormularioCadastro.tsx
+│       │   │
+│       │   ├── context/
+│       │   │   └── AuthContext.tsx
+│       │   │
+│       │   ├── services/
+│       │   │   ├── api.ts
+│       │   │   ├── authService.ts
+│       │   │   ├── alunoService.ts
+│       │   │   ├── instituicaoService.ts
+│       │   │   └── vantagemService.ts
+│       │   │
+│       │   ├── types/
+│       │   │   └── index.ts
+│       │   │
+│       │   └── pages/
+│       │       ├── LoginPage.tsx
+│       │       ├── CadastroAlunoPage.tsx
+│       │       ├── DashboardProfessorPage.tsx
+│       │       └── DashboardEmpresaPage.tsx
+│       │
+│       └── dist/                            (build - ignorado)
+│
+├── docker-compose.yml
+├── COMO_EXECUTAR.md
+└── README.md
 
 
 ```
 
+# 🚀 Como Executar
 
-## 🚀 Como Executar
+## Frontend
 
-### Frontend
+1. Acesse a pasta do frontend:
 
+```bash
+cd Codigo/frontend
+```
 
+2. Instale as dependências:
 
+```bash
+npm install
+```
 
-### Backend
+3. Execute o projeto:
 
+```bash
+npm run dev
+```
 
+4. O frontend estará disponível em:
 
-## 🛠️ Tecnologias Utilizadas
+```txt
+http://localhost:5173
+```
 
-* **Frontend:** 
-* **Backend:** 
-* **Banco de Dados:** 
+---
+
+## Backend
+
+1. Acesse a pasta do backend:
+
+```bash
+cd Codigo/backend
+```
+
+2. Execute o projeto Spring Boot:
+
+### Linux/Mac
+
+```bash
+./mvnw spring-boot:run
+```
+
+### Windows PowerShell
+
+```powershell
+mvnw spring-boot:run
+```
+
+Ou, caso tenha Maven instalado globalmente:
+
+```bash
+mvn spring-boot:run
+```
+
+3. O backend estará disponível em:
+
+```txt
+http://localhost:8080
+```
+
+---
+
+## Docker
+
+Na pasta Codigo execute:
+
+```bash
+docker-compose up --build
+```
+
+Para executar em segundo plano:
+
+```bash
+docker-compose up -d
+```
+
+Para encerrar os containers:
+
+```bash
+docker-compose down
+```
+
+---
+
+# 🛠️ Tecnologias Utilizadas
+
+## Frontend
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Router DOM
+- Axios
+
+## Backend
+
+- Java 21
+- Spring Boot
+- Spring Web
+- Spring Data JPA
+- Maven
+
+## Banco de Dados
+
+- PostgreSQL
+
+## DevOps
+
+- Docker
+- Docker Compose
 
 ---
