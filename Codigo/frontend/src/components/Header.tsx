@@ -2,6 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import type { TipoUsuario } from '../types';
 
+const perfilRota: Partial<Record<TipoUsuario, string>> = {
+  ALUNO: '/perfil/aluno',
+  EMPRESA: '/perfil/empresa',
+};
+
 const tipoLabel: Record<TipoUsuario, string> = {
   ALUNO: 'Aluno',
   PROFESSOR: 'Professor',
@@ -45,6 +50,19 @@ export function Header() {
                 {tipoLabel[usuario.tipo]}
               </span>
             </div>
+
+            {perfilRota[usuario.tipo] && (
+              <button
+                onClick={() => navigate(perfilRota[usuario.tipo]!)}
+                title="Meu Perfil"
+                className="flex items-center gap-2 bg-primary-700 hover:bg-primary-600 text-white text-sm font-medium px-3 py-2 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span className="hidden sm:inline">Perfil</span>
+              </button>
+            )}
 
             <button
               onClick={handleLogout}

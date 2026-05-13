@@ -7,6 +7,8 @@ import { CadastroEmpresaPage } from './pages/CadastroEmpresaPage';
 import { DashboardAlunoPage } from './pages/DashboardAlunoPage';
 import { DashboardProfessorPage } from './pages/DashboardProfessorPage';
 import { DashboardEmpresaPage } from './pages/DashboardEmpresaPage';
+import { PerfilAlunoPage } from './pages/PerfilAlunoPage';
+import { PerfilEmpresaPage } from './pages/PerfilEmpresaPage';
 
 export default function App() {
   return (
@@ -28,6 +30,14 @@ export default function App() {
           <Route
             path="/dashboard/empresa"
             element={<ProtectedRoute><DashboardEmpresaPage /></ProtectedRoute>}
+          />
+          <Route
+            path="/perfil/aluno"
+            element={<ProtectedRoute><PerfilAlunoPage /></ProtectedRoute>}
+          />
+          <Route
+            path="/perfil/empresa"
+            element={<ProtectedRoute><PerfilEmpresaPage /></ProtectedRoute>}
           />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
