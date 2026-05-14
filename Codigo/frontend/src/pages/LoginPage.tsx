@@ -36,7 +36,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800 flex items-center justify-center p-4">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#071F2A] via-[#0B3D3A] to-[#148A6A] flex items-center justify-center p-4">
       <GreenDots />
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8">
