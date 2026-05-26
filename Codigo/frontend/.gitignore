@@ -1,0 +1,31 @@
+# --- Dependências ---
+node_modules/
+jspm_packages/
+
+# --- Artefatos de Build e Logs ---
+dist/
+build/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- IDEs e Editores ---
+.vscode/
+.idea/
+*.sublime*
+
+# --- Sistema Operacional ---
+.DS_Store
+Thumbs.db
+
+# --- Variáveis de Ambiente ---
+# Nunca versionar arquivos com senhas e chaves de API
+.env
+.env.local
+.env.*.local
+
+# --- TypeScript (se aplicável) ---
+*.tsbuildinfo
