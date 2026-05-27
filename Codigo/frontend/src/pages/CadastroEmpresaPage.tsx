@@ -14,9 +14,18 @@ function formatCNPJ(value: string): string {
     .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
 }
 
+function Required() {
+  return <span className="text-red-500 ml-0.5">*</span>;
+}
+
 export function CadastroEmpresaPage() {
   const [form, setForm] = useState({
-    nome: '', email: '', senha: '', cnpj: '', descricao: '',
+    nome: '',
+    email: '',
+    senha: '',
+    confirmarSenha: '',
+    cnpj: '',
+    descricao: '',
   });
   const [erro, setErro] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,9 +41,16 @@ export function CadastroEmpresaPage() {
     }
   };
 
+  const senhasNaoConferem = form.confirmarSenha.length > 0 && form.senha !== form.confirmarSenha;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro('');
+
+    if (form.senha !== form.confirmarSenha) {
+      setErro('As senhas não coincidem.');
+      return;
+    }
 
     const cnpjDigits = form.cnpj.replace(/\D/g, '');
     if (cnpjDigits.length !== 14) {
@@ -44,7 +60,13 @@ export function CadastroEmpresaPage() {
 
     setLoading(true);
     try {
-      const usuario = await api.cadastrarEmpresa({ ...form, cnpj: cnpjDigits }) as Usuario;
+      const usuario = await api.cadastrarEmpresa({
+        nome: form.nome,
+        email: form.email,
+        senha: form.senha,
+        cnpj: cnpjDigits,
+        descricao: form.descricao,
+      }) as Usuario;
       login(usuario);
       navigate('/dashboard/empresa');
     } catch (err: unknown) {
@@ -56,7 +78,7 @@ export function CadastroEmpresaPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#071F2A] via-[#0B3D3A] to-[#148A6A] flex items-center justify-center p-4">
-        <GreenDots />
+      <GreenDots />
       <div className="relative w-full max-w-xl">
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-14 h-14 bg-emerald-400 rounded-2xl mb-3 shadow-lg">
@@ -71,19 +93,36 @@ export function CadastroEmpresaPage() {
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="form-label">Razão Social</label>
-              <input name="nome" className="form-input" placeholder="Nome da empresa" value={form.nome} onChange={handleChange} required />
+              <label className="form-label">Razão Social<Required /></label>
+              <input name="nome" className="form-input" placeholder="Nome oficial da empresa" value={form.nome} onChange={handleChange} required />
             </div>
             <div>
-              <label className="form-label">E-mail Corporativo</label>
+              <label className="form-label">E-mail Corporativo<Required /></label>
               <input name="email" type="email" className="form-input" placeholder="contato@empresa.com" value={form.email} onChange={handleChange} required />
             </div>
-            <div>
-              <label className="form-label">Senha</label>
-              <input name="senha" type="password" className="form-input" placeholder="Mínimo 6 caracteres" value={form.senha} onChange={handleChange} required minLength={6} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="form-label">Senha<Required /></label>
+                <input name="senha" type="password" className="form-input" placeholder="Mínimo 6 caracteres" value={form.senha} onChange={handleChange} required minLength={6} />
+              </div>
+              <div>
+                <label className="form-label">Confirme sua Senha<Required /></label>
+                <input
+                  name="confirmarSenha"
+                  type="password"
+                  className={`form-input ${senhasNaoConferem ? 'border-red-400 focus:ring-red-400' : ''}`}
+                  placeholder="Repita a senha"
+                  value={form.confirmarSenha}
+                  onChange={handleChange}
+                  required
+                />
+                {senhasNaoConferem && (
+                  <p className="text-red-500 text-xs mt-1">As senhas não coincidem.</p>
+                )}
+              </div>
             </div>
             <div>
-              <label className="form-label">CNPJ</label>
+              <label className="form-label">CNPJ<Required /></label>
               <input
                 name="cnpj"
                 className="form-input"
@@ -97,7 +136,7 @@ export function CadastroEmpresaPage() {
               <p className="text-xs text-gray-400 mt-1">Somente números (14 dígitos)</p>
             </div>
             <div>
-              <label className="form-label">Descrição da Empresa</label>
+              <label className="form-label">Descrição da Empresa<Required /></label>
               <textarea
                 name="descricao"
                 className="form-input resize-none"
@@ -109,13 +148,18 @@ export function CadastroEmpresaPage() {
               />
             </div>
 
+
             {erro && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                 {erro}
               </div>
             )}
 
-            <button type="submit" className="btn-primary w-full py-3 text-base" disabled={loading}>
+            <button
+              type="submit"
+              className="btn-primary w-full py-3 text-base"
+              disabled={loading || senhasNaoConferem}
+            >
               {loading ? 'Cadastrando...' : 'Criar Conta'}
             </button>
           </form>
