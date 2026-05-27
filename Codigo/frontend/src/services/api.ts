@@ -40,6 +40,9 @@ export const api = {
   listarVantagens: (empresaId: number) =>
     request(`/vantagens/empresa/${empresaId}`),
 
+  listarTodasVantagens: () =>
+    request('/vantagens'),
+
   criarVantagem: (empresaId: number, payload: object) =>
     request(`/vantagens/empresa/${empresaId}`, {
       method: 'POST',
@@ -66,4 +69,47 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(payload),
     }),
+
+  // ── TRANSAÇÕES
+  /** Lista alunos da mesma instituição (para o select do professor) */
+  listarAlunosDaInstituicao: (instituicaoId: number) =>
+    request(`/transacoes/alunos/instituicao/${instituicaoId}`),
+
+  /** Professor envia moedas para um aluno */
+  enviarMoedas: (payload: {
+    professorId: number;
+    alunoId: number;
+    quantidade: number;
+    mensagem?: string;
+  }) =>
+    request('/transacoes/enviar', { method: 'POST', body: JSON.stringify(payload) }),
+
+  /** Extrato de envios do professor */
+  extratoDosProfessor: (professorId: number) =>
+    request(`/transacoes/professor/${professorId}`),
+
+  /** Extrato de recebimentos do aluno */
+  extratoDoAluno: (alunoId: number) =>
+    request(`/transacoes/aluno/${alunoId}`),
+
+  // ── RESGATES
+
+  /** Aluno resgata uma vantagem */
+  resgatar: (alunoId: number, vantagemId: number) =>
+    request('/resgates', {
+      method: 'POST',
+      body: JSON.stringify({ alunoId, vantagemId }),
+    }),
+
+  /** Histórico de resgates do aluno */
+  resgatesDoAluno: (alunoId: number) =>
+    request(`/resgates/aluno/${alunoId}`),
+
+  /** Resgates pendentes/confirmados da empresa */
+  resgatesDaEmpresa: (empresaId: number) =>
+    request(`/resgates/empresa/${empresaId}`),
+
+  /** Empresa confirma entrega da vantagem */
+  confirmarResgate: (resgateId: number) =>
+    request(`/resgates/${resgateId}/confirmar`, { method: 'PUT' }),
 };

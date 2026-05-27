@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
@@ -15,6 +16,7 @@ const emptyForm: VantagemFormData = { nome: '', descricao: '', fotoUrl: '', cust
 
 export function DashboardEmpresaPage() {
   const { usuario } = useAuth();
+  const navigate = useNavigate();
   const [vantagens, setVantagens] = useState<Vantagem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -87,12 +89,23 @@ export function DashboardEmpresaPage() {
             <h1 className="text-2xl font-bold text-gray-900">Painel da Empresa</h1>
             <p className="text-gray-500 text-sm mt-1">{usuario.nome} · {usuario.cnpj}</p>
           </div>
-          <button onClick={abrirCriar} className="btn-primary flex items-center gap-2 self-start sm:self-auto">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
-            </svg>
-            Nova Vantagem
-          </button>
+          <div className="flex items-center gap-3 self-start sm:self-auto">
+            <button
+              onClick={() => navigate('/empresa/resgates')}
+              className="btn-secondary flex items-center gap-2 relative"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              Resgates
+            </button>
+            <button onClick={abrirCriar} className="btn-primary flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
+              </svg>
+              Nova Vantagem
+            </button>
+          </div>
         </div>
 
         {usuario.descricao && (
@@ -100,6 +113,28 @@ export function DashboardEmpresaPage() {
             <p className="text-gray-600 text-sm">{usuario.descricao}</p>
           </div>
         )}
+
+        <div
+          onClick={() => navigate('/empresa/resgates')}
+          className="card mb-6 border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 hover:shadow-md transition-all duration-200 cursor-pointer group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-emerald-200 group-hover:bg-emerald-300 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+              <svg className="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-emerald-900">Gerenciar resgates de vantagens</h3>
+              <p className="text-emerald-700 text-sm mt-0.5">
+                Veja quais alunos resgataram suas vantagens e confirme a entrega dos benefícios.
+              </p>
+            </div>
+            <svg className="w-5 h-5 text-emerald-500 group-hover:translate-x-1 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </div>
 
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">

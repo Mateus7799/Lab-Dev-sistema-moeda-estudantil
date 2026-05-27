@@ -30,3 +30,33 @@ export interface Vantagem {
   empresaId: number;
   empresaNome: string;
 }
+
+export interface AlunoResumo {
+  id: number;
+  nome: string;
+  curso: string;
+  saldoMoedas: number;
+}
+
+export interface Transacao {
+  id: number;
+  remetenteId: number;
+  remetenteNome: string;
+  destinatarioId: number;
+  destinatarioNome: string;
+  quantidade: number;
+  mensagem?: string;
+  criadoEm: string;
+}
+
+export interface Resgate {
+  id: number;
+  alunoId: number;
+  alunoNome: string;
+  vantagemId: number;
+  vantagemNome: string;
+  empresaNome: string;
+  custo: number;
+  status: 'PENDENTE' | 'CONFIRMADO' | 'CANCELADO';
+  criadoEm: string;
+}

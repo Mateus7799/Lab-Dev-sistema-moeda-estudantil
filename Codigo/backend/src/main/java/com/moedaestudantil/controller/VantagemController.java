@@ -26,6 +26,22 @@ public class VantagemController {
         this.empresaRepository = empresaRepository;
     }
 
+    /**
+     * GET /api/vantagens
+     * Lista TODAS as vantagens de todas as empresas.
+     * Usado pela loja do aluno (LojaDasVantagensPage).
+     */
+    @GetMapping
+    public List<VantagemResponse> listarTodas() {
+        return vantagemRepository.findAll()
+                .stream().map(VantagemResponse::from).toList();
+    }
+
+    /**
+     * GET /api/vantagens/empresa/{empresaId}
+     * Lista apenas as vantagens de uma empresa específica.
+     * Usado pelo painel da empresa.
+     */
     @GetMapping("/empresa/{empresaId}")
     public List<VantagemResponse> listarPorEmpresa(@PathVariable Long empresaId) {
         return vantagemRepository.findByEmpresaId(empresaId)
