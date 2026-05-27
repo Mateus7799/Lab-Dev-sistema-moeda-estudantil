@@ -11,44 +11,59 @@ import { PerfilAlunoPage } from './pages/PerfilAlunoPage';
 import { PerfilEmpresaPage } from './pages/PerfilEmpresaPage';
 import { VantagensPage } from './pages/VantagensPage';
 import { ExtratoPage } from './pages/ExtratoPage';
+import { EnviarMoedasPage } from './pages/EnviarMoedasPage';
+import { LojaDasVantagensPage } from './pages/LojaDasVantagensPage';
+import { PainelResgatesEmpresaPage } from './pages/PainelResgatesEmpresaPage';
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          {/* Públicas */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/cadastro/aluno" element={<CadastroAlunoPage />} />
           <Route path="/cadastro/empresa" element={<CadastroEmpresaPage />} />
-          <Route
-            path="/dashboard/aluno"
-            element={<ProtectedRoute><DashboardAlunoPage /></ProtectedRoute>}
-          />
-          <Route
-            path="/dashboard/professor"
-            element={<ProtectedRoute><DashboardProfessorPage /></ProtectedRoute>}
-          />
-          <Route
-            path="/dashboard/empresa"
-            element={<ProtectedRoute><DashboardEmpresaPage /></ProtectedRoute>}
-          />
-          <Route
-            path="/perfil/aluno"
-            element={<ProtectedRoute><PerfilAlunoPage /></ProtectedRoute>}
-          />
-          <Route
-            path="/perfil/empresa"
-            element={<ProtectedRoute><PerfilEmpresaPage /></ProtectedRoute>}
-          />
-          <Route
-            path="/vantagens"
-            element={<ProtectedRoute><VantagensPage /></ProtectedRoute>}
-          />
-          <Route
-            path="/extrato"
-            element={<ProtectedRoute><ExtratoPage /></ProtectedRoute>}
-          />
+
+          {/* Dashboards */}
+          <Route path="/dashboard/aluno" element={
+            <ProtectedRoute><DashboardAlunoPage /></ProtectedRoute>
+          } />
+          <Route path="/dashboard/professor" element={
+            <ProtectedRoute><DashboardProfessorPage /></ProtectedRoute>
+          } />
+          <Route path="/dashboard/empresa" element={
+            <ProtectedRoute><DashboardEmpresaPage /></ProtectedRoute>
+          } />
+
+          {/* Perfis */}
+          <Route path="/perfil/aluno" element={
+            <ProtectedRoute><PerfilAlunoPage /></ProtectedRoute>
+          } />
+          <Route path="/perfil/empresa" element={
+            <ProtectedRoute><PerfilEmpresaPage /></ProtectedRoute>
+          } />
+
+          {/* Rotas do upstream */}
+          <Route path="/vantagens" element={
+            <ProtectedRoute><VantagensPage /></ProtectedRoute>
+          } />
+          <Route path="/extrato" element={
+            <ProtectedRoute><ExtratoPage /></ProtectedRoute>
+          } />
+
+          {/* Sistema de moedas */}
+          <Route path="/professor/enviar-moedas" element={
+            <ProtectedRoute><EnviarMoedasPage /></ProtectedRoute>
+          } />
+          <Route path="/aluno/vantagens" element={
+            <ProtectedRoute><LojaDasVantagensPage /></ProtectedRoute>
+          } />
+          <Route path="/empresa/resgates" element={
+            <ProtectedRoute><PainelResgatesEmpresaPage /></ProtectedRoute>
+          } />
+
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>
