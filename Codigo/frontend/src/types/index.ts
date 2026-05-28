@@ -25,8 +25,10 @@ export interface Vantagem {
   id: number;
   nome: string;
   descricao: string;
-  fotoUrl?: string;
   custo: number;
+  quantidadeCupons: number | null; // Controle de estoque total disponível
+  cuponsResgatados: number;        // Quantidade de itens já processados na fila
+  dataValidade: string | null;     // Data limite para resgatar o benefício
   empresaId: number;
   empresaNome: string;
 }
@@ -59,4 +61,15 @@ export interface Resgate {
   custo: number;
   status: 'PENDENTE' | 'CONFIRMADO' | 'CANCELADO';
   criadoEm: string;
+}
+
+export interface Cupom {
+  id: number;
+  vantagemId: number;
+  vantagemNome: string;
+  empresaNome: string;
+  custoPago: number;
+  codigoCupom: string; // Token único criptografado/gerado para validação
+  dataResgate: string;
+  status: 'ATIVO' | 'USADO' | 'EXPIRADO';
 }

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import type { TipoUsuario } from '../types';
 
@@ -67,8 +67,13 @@ const tipoLabel: Record<TipoUsuario, string> = {
 export function Header() {
   const { usuario, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation(); // Resgatado do Code 1 para rastrear a URL atual
 
   if (!usuario) return null;
+
+  const homePath = painelRota[usuario.tipo];
+  // Verifica se o usuário já está no seu respectivo dashboard
+  const isOnDashboard = location.pathname === homePath;
 
   const acoes = acoesNav[usuario.tipo] ?? [];
   const primeiroNome = usuario.nome.split(' ')[0];
@@ -82,7 +87,7 @@ export function Header() {
 
           {/* Logo — clica e volta ao painel */}
           <button
-            onClick={() => navigate(painelRota[usuario.tipo])}
+            onClick={() => navigate(homePath)}
             className="flex items-center gap-2.5 flex-shrink-0 hover:opacity-80 transition-opacity"
           >
             <div className="w-8 h-8 bg-primary-400 rounded-lg flex items-center justify-center">
@@ -93,10 +98,24 @@ export function Header() {
             <span className="text-white font-semibold text-lg tracking-tight hidden sm:block">Moeda Estudantil</span>
           </button>
 
-          {/* Lado direito */}
+          {/* Lado direito de navegação */}
           <div className="flex items-center gap-2">
 
-            {/* Botões de ação rápida */}
+            {/* Botão Dinâmico "Painel": Só renderiza se o usuário estiver fora do dashboard dele (Do Code 1) */}
+            {!isOnDashboard && (
+              <button
+                onClick={() => navigate(homePath)}
+                title="Voltar ao Painel"
+                className="flex items-center gap-1.5 bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium px-3 py-2 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span className="hidden sm:inline">Painel</span>
+              </button>
+            )}
+
+            {/* Botões de ação rápida baseados no perfil (Vantagens, Extrato, Enviar moedas...) */}
             {acoes.map(a => (
               <button
                 key={a.rota}
@@ -112,10 +131,11 @@ export function Header() {
               <div className="w-px h-6 bg-primary-700 mx-1 hidden sm:block" />
             )}
 
-            {/* Chip de identidade */}
+            {/* Chip de identidade visual (Perfil e nome abreviado) */}
             {perfilRota[usuario.tipo] ? (
               <button
                 onClick={() => navigate(perfilRota[usuario.tipo]!)}
+                title="Meu Perfil"
                 className="flex items-center gap-2 bg-primary-800 hover:bg-primary-700 border border-primary-700 hover:border-primary-500 pl-1.5 pr-3 py-1.5 rounded-lg transition-all duration-200 group"
               >
                 <div className="w-7 h-7 rounded-full bg-primary-500 group-hover:bg-primary-400 flex items-center justify-center flex-shrink-0 transition-colors">
@@ -142,7 +162,7 @@ export function Header() {
               </div>
             )}
 
-            {/* Sair */}
+            {/* Sair do Sistema */}
             <button
               onClick={() => { logout(); navigate('/login'); }}
               title="Sair"
@@ -153,6 +173,7 @@ export function Header() {
               </svg>
               <span className="hidden sm:inline">Sair</span>
             </button>
+
           </div>
         </div>
       </div>

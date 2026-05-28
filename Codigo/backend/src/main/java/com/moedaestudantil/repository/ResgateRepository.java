@@ -8,9 +8,7 @@ import java.util.List;
 
 @Repository
 public interface ResgateRepository extends JpaRepository<Resgate, Long> {
-    // Resgates feitos por um aluno
-    List<Resgate> findByAlunoIdOrderByCriadoEmDesc(Long alunoId);
-
-    // Resgates de vantagens de uma empresa (para o dashboard da empresa)
-    List<Resgate> findByVantagemEmpresaIdOrderByCriadoEmDesc(Long empresaId);
+    List<Resgate> findByAlunoIdOrderByDataResgateDesc(Long alunoId);
+    long countByVantagemId(Long vantagemId);
+    boolean existsByAlunoIdAndVantagemId(Long alunoId, Long vantagemId);
 }

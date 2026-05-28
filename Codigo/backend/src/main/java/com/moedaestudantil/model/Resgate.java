@@ -25,16 +25,17 @@ public class Resgate {
     private Vantagem vantagem;
 
     @Column(nullable = false)
-    private Integer custo;
+    private LocalDateTime dataResgate = LocalDateTime.now();
+
+    // código do cupom gerado para o aluno
+    @Column(nullable = false, unique = true, length = 20)
+    private String codigoCupom;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private StatusResgate status = StatusResgate.PENDENTE;
+    private Status status = Status.ATIVO;
 
-    @Column(name = "criado_em", nullable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
-
-    public enum StatusResgate {
-        PENDENTE, CONFIRMADO, CANCELADO
+    public enum Status {
+        ATIVO, USADO, EXPIRADO
     }
 }
