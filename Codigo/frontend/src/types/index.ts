@@ -36,6 +36,7 @@ export interface Vantagem {
 export interface AlunoResumo {
   id: number;
   nome: string;
+  email: string;
   curso: string;
   saldoMoedas: number;
 }

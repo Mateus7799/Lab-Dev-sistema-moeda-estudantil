@@ -114,6 +114,7 @@ public class TransacaoController {
                 .map(a -> Map.<String, Object>of(
                         "id", a.getId(),
                         "nome", a.getNome(),
+                        "email", a.getEmail(),
                         "curso", a.getCurso() != null ? a.getCurso() : "",
                         "saldoMoedas", a.getSaldoMoedas()
                 ))
