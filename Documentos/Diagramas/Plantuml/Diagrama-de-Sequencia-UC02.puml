@@ -1,0 +1,137 @@
+@startuml
+<style>
+sequenceDiagram {
+    participant {
+        Padding 15
+    }
+    box {
+        Padding 10
+    }
+}
+</style>
+
+skinparam linestyle ortho
+skinparam ActorBackgroundColor #FFFBEB
+skinparam ActorBorderColor #D97706
+skinparam SequenceBoxBackgroundColor #F8FAFC
+skinparam SequenceBoxBorderColor #CBD5E1
+skinparam SequenceGroupBackgroundColor #FFFFFF
+skinparam SequenceGroupHeaderBackgroundColor #F1F5F9
+
+actor "Aluno (Visitante)" as User
+
+box "Camada Front-End (React)" #EFF6FF
+    participant "CadastroAlunoPage" as UI
+    participant "api (services)" as APIClient
+    participant "AuthContext" as AuthCtx
+end box
+
+box "Serviço Externo" #F5F5F5
+    participant "ViaCEP API" as ViaCEP
+end box
+
+box "Camada Back-End (Spring Boot)" #F0FDF4
+    participant "CadastroController" as Ctrl
+    participant "UsuarioRepository" as UserRepo
+    participant "InstituicaoRepository" as InstRepo
+    participant "AlunoRepository" as AlunoRepo
+end box
+
+database "Banco de Dados" as DB #F8FAFC
+
+note over UI: useEffect() ao montar a página
+activate UI
+UI -> APIClient: listarInstituicoes()
+activate APIClient
+APIClient -> InstRepo: GET /api/instituicoes (implícito)
+activate InstRepo
+InstRepo -> DB: SELECT * FROM instituicao
+activate DB
+DB --> InstRepo: Lista de Instituições
+deactivate DB
+InstRepo --> APIClient: List<Instituicao>
+deactivate InstRepo
+APIClient --> UI: setInstituicoes(data)
+deactivate APIClient
+
+opt Aluno digita um CEP válido (8 dígitos)
+    UI -> UI: fetchCEP(digits) \nsetCepLoading(true)
+    UI -> ViaCEP: fetch(https://viacep.com.br/ws/{cep}/json/)
+    activate ViaCEP
+    ViaCEP --> UI: JSON com dados do endereço
+    deactivate ViaCEP
+    UI -> UI: setForm() com logradouro, bairro, etc.\nsetCepLoading(false)
+end
+
+User -> UI: Preenche os campos obrigatórios e clica em "Criar Conta"
+UI -> UI: handleSubmit(e)\nValidar senhas e tamanho do CPF\nbuildEndereco()\nsetLoading(true)
+
+UI -> APIClient: cadastrarAluno(payload)
+activate APIClient
+
+APIClient -> Ctrl: POST /api/cadastro/aluno \n[RequestBody: CadastroAlunoRequest]
+activate Ctrl
+
+Ctrl -> UserRepo: existsByEmail(request.getEmail())
+activate UserRepo
+UserRepo -> DB: SELECT count(*) FROM usuarios WHERE email = ?
+activate DB
+DB --> UserRepo: count
+deactivate DB
+UserRepo --> Ctrl: boolean
+deactivate UserRepo
+
+alt E-mail já cadastrado
+    Ctrl --> APIClient: ResponseEntity.badRequest()\n[Body: {"erro": "E-mail já cadastrado."}]
+    APIClient --> UI: Lança erro de e-mail duplicado
+    UI -> UI: setErro("E-mail já cadastrado.")\nsetLoading(false)
+    UI --> User: Exibe mensagem de erro na tela
+
+else E-mail Disponível
+
+    Ctrl -> InstRepo: findById(request.getInstituicaoId())
+    activate InstRepo
+    InstRepo -> DB: SELECT * FROM instituicao WHERE id = ?
+    activate DB
+    DB --> InstRepo: Registro ou vazio
+    deactivate DB
+    InstRepo --> Ctrl: Optional<Instituicao>
+    deactivate InstRepo
+    
+    alt Instituição não encontrada
+        Ctrl --> APIClient: ResponseEntity.badRequest()\n[Body: {"erro": "Instituição não encontrada."}]
+        APIClient --> UI: Lança erro de instituição
+        UI -> UI: setErro("Instituição não encontrada.")\nsetLoading(false)
+        UI --> User: Exibe mensagem de erro na tela
+        
+    else Fluxo de Sucesso: Salvando Aluno
+        Ctrl -> Ctrl: Instancia novo Aluno e preenche dados\n(saldoMoedas = 0)
+        Ctrl -> AlunoRepo: save(aluno)
+        activate AlunoRepo
+        AlunoRepo -> DB: INSERT INTO aluno (...) e usuarios (...)
+        activate DB
+        DB --> AlunoRepo: Aluno persistido com ID
+        deactivate DB
+        AlunoRepo --> Ctrl: Aluno salvo
+        deactivate AlunoRepo
+        
+        Ctrl -> Ctrl: UsuarioResponse.from(saved)
+        Ctrl --> APIClient: ResponseEntity.ok(UsuarioResponse)
+        deactivate Ctrl
+        
+        APIClient --> UI: Retorna objeto Usuario cadastrado
+        deactivate APIClient
+        
+        UI -> AuthCtx: login(usuario)
+        activate AuthCtx
+        note over AuthCtx: Armazena o estado do\naluno logado globalmente
+        AuthCtx --> UI
+        deactivate AuthCtx
+        
+        UI -> UI: navigate('/dashboard/aluno')\nsetLoading(false)
+        UI --> User: Redireciona para o painel do Aluno
+    end
+end
+deactivate UI
+
+@enduml

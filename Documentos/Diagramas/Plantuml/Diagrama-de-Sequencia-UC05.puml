@@ -1,0 +1,172 @@
+@startuml
+' Configuração moderna de espaçamento via CSS nativo
+<style>
+sequenceDiagram {
+    participant {
+        Padding 15
+    }
+    box {
+        Padding 10
+    }
+}
+</style>
+
+skinparam linestyle ortho
+
+' Estilização de cores
+skinparam ActorBackgroundColor #FFFBEB
+skinparam ActorBorderColor #D97706
+skinparam SequenceBoxBackgroundColor #F8FAFC
+skinparam SequenceBoxBorderColor #CBD5E1
+skinparam SequenceGroupBackgroundColor #FFFFFF
+skinparam SequenceGroupHeaderBackgroundColor #F1F5F9
+
+actor "Professor (Autenticado)" as User
+
+box "Camada Front-End (React)" #EFF6FF
+    participant "EnviarMoedasPage" as UI
+    participant "api (services)" as APIClient
+    participant "AuthContext" as AuthCtx
+end box
+
+box "Camada Back-End (Spring Boot)" #F0FDF4
+    participant "TransacaoController" as Ctrl
+    participant "ProfessorRepository" as ProfRepo
+    participant "AlunoRepository" as AlunoRepo
+    participant "TransacaoRepository" as TxRepo
+end box
+
+database "Banco de Dados" as DB #F8FAFC
+
+' ── CARREGAMENTO DA PÁGINA (useEffect) ──────────────────────────────
+== Inicialização da Página (Carregamento de Dados) ==
+
+User -> UI: Acessa a página de Envio de Moedas
+activate UI
+
+UI -> UI: useEffect()\nVerifica se usuário é PROFESSOR
+
+UI -> APIClient: Promise.all([\n  listarAlunosDaInstituicao(instituicaoId),\n  extratoDosProfessor(professorId)\n])
+activate APIClient
+
+' Chamada 1: Listar Alunos
+APIClient -> Ctrl: GET /api/transacoes/alunos/instituicao/{instituicaoId}
+activate Ctrl
+Ctrl -> AlunoRepo: findAll()
+activate AlunoRepo
+AlunoRepo -> DB: SELECT * FROM aluno
+activate DB
+DB --> AlunoRepo: Lista de Alunos
+deactivate DB
+AlunoRepo --> Ctrl: Lista de entidades Aluno
+deactivate AlunoRepo
+Ctrl --> APIClient: ResponseEntity.ok(alunosFiltrados)
+
+' Chamada 2: Histórico/Extrato do Professor
+APIClient -> Ctrl: GET /api/transacoes/professor/{professorId}
+Ctrl -> TxRepo: findByRemetenteIdOrderByCriadoEmDesc(id)
+activate TxRepo
+TxRepo -> DB: SELECT * FROM transacao WHERE remetente_id = ? ORDER BY criado_em DESC
+activate DB
+DB --> TxRepo: Lista de Transações
+deactivate DB
+TxRepo --> Ctrl: Lista de Transações
+deactivate TxRepo
+Ctrl --> APIClient: ResponseEntity.ok(listaTransacaoResponse)
+deactivate Ctrl
+
+APIClient --> UI: Retorna resolve([alunos, extrato])
+deactivate APIClient
+
+UI -> UI: setAlunos(a)\nsetExtrato(e)\nsetLoadingDados(false)
+UI --> User: Renderiza formulário e Histórico de Envios
+
+' ── EXECUÇÃO DA TRANSFERÊNCIA (handleEnviar) ────────────────────────
+== Execução da Transferência de Moedas ==
+
+User -> UI: Seleciona aluno, define quantidade, mensagem e clica em "Enviar moedas"
+UI -> UI: handleEnviar(e)\nValidar quantidade > 0 e quantidade <= saldo
+
+UI -> APIClient: enviarMoedas(payload)
+activate APIClient
+
+APIClient -> Ctrl: POST /api/transacoes/enviar\n[RequestBody: EnviarMoedasRequest]
+activate Ctrl
+
+' Verificação do Professor
+Ctrl -> ProfRepo: findById(request.getProfessorId())
+activate ProfRepo
+ProfRepo -> DB: SELECT * FROM professor/usuarios WHERE id = ?
+activate DB
+DB --> ProfRepo: registro ou vazio
+deactivate DB
+ProfRepo --> Ctrl: Professor
+deactivate ProfRepo
+
+' Verificação do Aluno
+Ctrl -> AlunoRepo: findById(request.getAlunoId())
+activate AlunoRepo
+AlunoRepo -> DB: SELECT * FROM aluno/usuarios WHERE id = ?
+activate DB
+DB --> AlunoRepo: registro ou vazio
+deactivate DB
+AlunoRepo --> Ctrl: Aluno
+deactivate AlunoRepo
+
+alt Saldo Insuficiente (professor.getSaldoMoedas() < quantidade)
+    Ctrl --> APIClient: ResponseEntity.badRequest()\n[Body: {"erro": "Saldo insuficiente..."}]
+    APIClient --> UI: Lança erro de saldo insuficiente
+    UI -> UI: setErro("Saldo insuficiente...")
+    UI --> User: Exibe mensagem de erro na tela
+
+else Saldo Suficiente e Entidades Válidas
+    Ctrl -> Ctrl: professor.setSaldoMoedas(saldo - qtd)
+    Ctrl -> ProfRepo: save(professor)
+    activate ProfRepo
+    ProfRepo -> DB: UPDATE professor SET saldo_moedas = ? WHERE id = ?
+    activate DB
+    DB --> ProfRepo: Sucesso
+    deactivate DB
+    ProfRepo --> Ctrl: salvo
+    deactivate ProfRepo
+    
+    Ctrl -> Ctrl: aluno.setSaldoMoedas(saldo + qtd)
+    Ctrl -> AlunoRepo: save(aluno)
+    activate AlunoRepo
+    AlunoRepo -> DB: UPDATE aluno SET saldo_moedas = ? WHERE id = ?
+    activate DB
+    DB --> AlunoRepo: Sucesso
+    deactivate DB
+    AlunoRepo --> Ctrl: salvo
+    deactivate AlunoRepo
+    
+    Ctrl -> Ctrl: Instancia nova Transacao e vincula remetente/destinatario
+    Ctrl -> TxRepo: save(transacao)
+    activate TxRepo
+    TxRepo -> DB: INSERT INTO transacao (remetente_id, destinatario_id, quantidade, mensagem, criado_em)
+    activate DB
+    DB --> TxRepo: Transacao persistida com ID
+    deactivate DB
+    TxRepo --> Ctrl: transacao salva
+    deactivate TxRepo
+    
+    Ctrl -> Ctrl: TransacaoResponse.from(saved)
+    Ctrl --> APIClient: ResponseEntity.ok(TransacaoResponse)
+    deactivate Ctrl
+    
+    APIClient --> UI: Retorna objeto TransacaoResponse
+    deactivate APIClient
+    
+    ' Sincronização do estado global do Front-end
+    UI -> AuthCtx: login({ ...usuario, saldoMoedas: saldo - qtd })
+    activate AuthCtx
+    note over AuthCtx: Atualiza o saldo do\nprofessor na sessão global
+    AuthCtx --> UI
+    deactivate AuthCtx
+    
+    UI -> UI: setExtrato([transacao, ...prev])\nsetSucesso("Moedas enviadas...")\nsetForm({ ...campos_vazios })
+    UI --> User: Exibe mensagem de sucesso e atualiza tabela de histórico
+end
+deactivate UI
+
+@enduml

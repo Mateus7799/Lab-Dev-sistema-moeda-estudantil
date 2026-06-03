@@ -1,0 +1,110 @@
+@startuml
+<style>
+sequenceDiagram {
+    participant {
+        Padding 15
+    }
+    box {
+        Padding 10
+    }
+}
+</style>
+
+skinparam linestyle ortho
+
+skinparam ActorBackgroundColor #FFFBEB
+skinparam ActorBorderColor #D97706
+skinparam SequenceBoxBackgroundColor #F8FAFC
+skinparam SequenceBoxBorderColor #CBD5E1
+skinparam SequenceGroupBackgroundColor #FFFFFF
+skinparam SequenceGroupHeaderBackgroundColor #F1F5F9
+
+actor "Empresa (Visitante)" as User
+
+box "Camada Front-End (React)" #EFF6FF
+    participant "CadastroEmpresaPage" as UI
+    participant "api (services)" as APIClient
+    participant "AuthContext" as AuthCtx
+end box
+
+box "Camada Back-End (Spring Boot)" #F0FDF4
+    participant "CadastroController" as Ctrl
+    participant "UsuarioRepository" as UserRepo
+    participant "EmpresaParceiraRepository" as EmpRepo
+end box
+
+database "Banco de Dados" as DB #F8FAFC
+
+User -> UI: Preenche Nome, E-mail, Senha, CNPJ e clica em "Criar Conta"
+activate UI
+
+UI -> UI: handleSubmit(e)\nValidar senhas e campos básicos\nsetLoading(true)
+
+UI -> APIClient: cadastrarEmpresa(payload)
+activate APIClient
+
+APIClient -> Ctrl: POST /api/cadastro/empresa\n[RequestBody: CadastroEmpresaRequest]
+activate Ctrl
+
+Ctrl -> UserRepo: existsByEmail(request.getEmail())
+activate UserRepo
+UserRepo -> DB: SELECT count(*) FROM usuarios WHERE email = ?
+activate DB
+DB --> UserRepo: count
+deactivate DB
+UserRepo --> Ctrl: boolean
+deactivate UserRepo
+
+alt E-mail já cadastrado
+    Ctrl --> APIClient: ResponseEntity.badRequest()\n[Body: {"erro": "E-mail já cadastrado."}]
+    APIClient --> UI: Lança erro de e-mail duplicado
+    UI -> UI: setErro("E-mail já cadastrado.")\nsetLoading(false)
+    UI --> User: Exibe mensagem de erro na tela
+
+else E-mail Disponível
+    Ctrl -> EmpRepo: existsByCnpj(request.getCnpj())
+    activate EmpRepo
+    EmpRepo -> DB: SELECT count(*) FROM empresas WHERE cnpj = ?
+    activate DB
+    DB --> EmpRepo: count
+    deactivate DB
+    EmpRepo --> Ctrl: boolean
+    deactivate EmpRepo
+    
+    alt CNPJ já cadastrado
+        Ctrl --> APIClient: ResponseEntity.badRequest()\n[Body: {"erro": "CNPJ já cadastrado."}]
+        APIClient --> UI: Lança erro de CNPJ duplicado
+        UI -> UI: setErro("CNPJ já cadastrado.")\nsetLoading(false)
+        UI --> User: Exibe mensagem de erro na tela
+        
+    else Fluxo de Sucesso: Salvando Empresa
+        Ctrl -> Ctrl: Instancia nova EmpresaParceira e preenche dados\n(tipo = EMPRESA)
+        Ctrl -> EmpRepo: save(empresa)
+        activate EmpRepo
+        EmpRepo -> DB: INSERT INTO empresa_parceira (...) e usuarios (...)
+        activate DB
+        DB --> EmpRepo: Empresa persistida com ID
+        deactivate DB
+        EmpRepo --> Ctrl: Empresa salva
+        deactivate EmpRepo
+        
+        Ctrl -> Ctrl: UsuarioResponse.from(saved)
+        Ctrl --> APIClient: ResponseEntity.ok(UsuarioResponse)
+        deactivate Ctrl
+        
+        APIClient --> UI: Retorna objeto Usuario cadastrado
+        deactivate APIClient
+        
+        UI -> AuthCtx: login(usuario)
+        activate AuthCtx
+        note over AuthCtx: Armazena o estado da\nempresa logada globalmente
+        AuthCtx --> UI
+        deactivate AuthCtx
+        
+        UI -> UI: navigate('/dashboard/empresa')\nsetLoading(false)
+        UI --> User: Redireciona para o painel da Empresa
+    end
+end
+deactivate UI
+
+@enduml

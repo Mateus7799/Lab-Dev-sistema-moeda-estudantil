@@ -1,0 +1,111 @@
+@startuml
+autonumber
+
+<style>
+sequenceDiagram {
+    box {
+        Padding 10
+    }
+    participant {
+        Padding 10
+    }
+}
+</style>
+
+actor "Aluno" as Aluno
+box "Camada Front-End (React)" #LightBlue
+    participant "LojaDasVantagensPage" as Page
+    participant "api.ts (Axios)" as API
+end box
+
+box "Back-End: API Gateway / Controller (Spring)" #LightCyan
+    participant "ResgateController" as Ctrl
+    participant "ResgateProducer" as Prod
+end box
+
+queue "RabbitMQ\n(vantagens.resgate.queue)" as Fila #LightYellow
+
+box "Back-End: Consumer / Worker Assíncrono (Spring)" #Thistle
+    participant "ResgateConsumer" as Cons
+    participant "ResgateService" as Serv
+end box
+
+database "Banco de Dados\n(PostgreSQL/MySQL)" as DB #LightGray
+
+title UC08 - Resgatar Vantagem (Processamento Assíncrono)
+
+' === PARTE 1: SOLICITAÇÃO ASSÍNCRONA (PRODUCER) ===
+Aluno -> Page : 1. Clica em "Resgatar" na Vantagem desejada
+activate Page
+
+Page -> Page : Valida saldo localmente\nhandleResgatar()\nsetResgatando(id)
+
+Page -> API : 2. api.resgatar(alunoId, vantagemId)
+activate API
+
+API -> Ctrl : 3. POST /api/resgates/solicitar\n[Body: alunoId, vantagemId]
+activate Ctrl
+
+Ctrl -> DB : 4. existsById(alunoId) e existsById(vantagemId)
+activate DB
+DB --> Ctrl : 5. Entidades Existem (true)
+deactivate DB
+
+Ctrl -> Prod : 6. enviar(alunoId, vantagemId)
+activate Prod
+
+Prod -> Fila : 7. convertAndSend(RESGATE_QUEUE, ResgateMessage)
+note over Fila : Mensagem guardada de forma durável\nProcessamento FIFO (concurrency=1)
+Fila --> Prod
+deactivate Prod
+
+Ctrl --> API : 8. 202 Accepted\n{"mensagem": "Pedido de resgate enfileirado..."}
+deactivate Ctrl
+
+API --> Page : 9. Retorna sucesso do enfileiramento (Promise resolved)
+deactivate API
+
+Page -> Page : 10. Atualiza saldo local no AuthContext\nsetSucesso("Vantagem resgatada com sucesso!")
+Page --> Aluno : 11. Mostra mensagem de sucesso na tela e libera a UI
+deactivate Page
+
+
+' === PARTE 2: PROCESSAMENTO EM BACKGROUND (CONSUMER) ===
+note over Fila, Cons : Ocorre de forma assíncrona e em paralelo à navegação do usuário
+
+Fila -> Cons : 12. @RabbitListener captura ResgateMessage
+activate Cons
+note over Cons : Log: "Processando resgate..."
+
+Cons -> Serv : 13. processar(alunoId, vantagemId)
+activate Serv
+
+Serv -> DB : 14. findById(alunoId) e findById(vantagemId)
+activate DB
+DB --> Serv : 15. Dados do Aluno e da Vantagem
+deactivate DB
+
+alt Qualquer Validação Falhar (Ex: Saldo Insuficiente ou Sem Estoque)
+    note over Serv #Pink : Lança IllegalArgumentException / IllegalStateException
+    Serv --> Cons : 16. Propaga Exceção
+    Cons -> Cons : 17. Log de Erro (Descarte da mensagem para evitar loops)
+else Sucesso nas Regras de Negócio
+    Serv -> Serv : 18. aluno.setSaldoMoedas(saldo - custo)
+    Serv -> DB : 19. alunoRepository.save(aluno)
+    
+    Serv -> Serv : 20. vantagem.setCuponsResgatados(atual + 1)
+    Serv -> DB : 21. vantagemRepository.save(vantagem)
+    
+    Serv -> Serv : 22. Gerar UUID para código do cupom
+    Serv -> DB : 23. resgateRepository.save(resgate)
+    activate DB
+    DB --> Serv : 24. Registro de Resgate Salvo
+    deactivate DB
+    
+    Serv --> Cons : 25. Retorna objeto Resgate
+    deactivate Serv
+    note over Cons : Log: "Resgate concluído..."
+end
+
+deactivate Cons
+@enduml

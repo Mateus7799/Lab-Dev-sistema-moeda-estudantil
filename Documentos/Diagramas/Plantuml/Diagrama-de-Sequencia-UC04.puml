@@ -1,0 +1,70 @@
+@startuml
+<style>
+sequenceDiagram {
+    participant {
+        Padding 15
+    }
+    box {
+        Padding 10
+    }
+}
+</style>
+
+skinparam linestyle ortho
+
+skinparam ActorBackgroundColor #FFFBEB
+skinparam ActorBorderColor #D97706
+skinparam SequenceBoxBackgroundColor #F8FAFC
+skinparam SequenceBoxBorderColor #CBD5E1
+skinparam SequenceGroupBackgroundColor #FFFFFF
+skinparam SequenceGroupHeaderBackgroundColor #F1F5F9
+
+actor "Professor (Autenticado)" as User
+
+box "Camada Front-End (React)" #EFF6FF
+    participant "DashboardProfessorPage" as UI
+    participant "AuthContext" as AuthCtx
+end box
+
+box "Camada Back-End (Spring Boot)" #F0FDF4
+    participant "InstituicaoController" as Ctrl
+    participant "Professor" as Model <<Entity>>
+end box
+
+database "Banco de Dados" as DB #F8FAFC
+
+== Carga Inicial / Pré-Cadastro do Docente ==
+
+note over Model, DB
+  Como o Professor é pré-cadastrado no sistema, os registros 
+  são inseridos previamente no Banco de Dados via Carga de Dados.
+  Abaixo está mapeado o vínculo estrutural do Modelo.
+end note
+
+activate Model
+Model -> Model: setSaldoMoedas(0) \n// Valor padrão da Entidade
+Model -> Model: setInstituicao(instituicao)
+DB ---/ Model: INSERT INTO usuarios (...) e professor (...) \n[id, departamento, saldo_moedas, instituicao_id]
+deactivate Model
+
+== Acesso à Dashboard pós-Autenticação ==
+
+User -> UI: Acessa a rota da Dashboard de Professor
+activate UI
+
+UI -> AuthCtx: useAuth() \n// Solicita dados do usuário logado
+activate AuthCtx
+AuthCtx --> UI: retorna objeto 'usuario'
+deactivate AuthCtx
+
+alt Se o usuário não estiver carregado no contexto
+    UI --> User: Retorna null (Bloqueia renderização)
+else Usuário presente no Contexto
+    UI -> UI: Lê usuario.nome e usuario.email
+    UI -> UI: Lê usuario.departamento e usuario.instituicaoNome
+    UI -> UI: Exibe saldoMoedas (usuario.saldoMoedas ?? 0)
+    UI --> User: Renderiza a tela de Dashboard com dados cadastrais e ações
+end
+deactivate UI
+
+@enduml

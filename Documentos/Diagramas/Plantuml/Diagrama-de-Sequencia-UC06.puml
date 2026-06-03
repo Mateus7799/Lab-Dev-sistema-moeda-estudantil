@@ -1,0 +1,114 @@
+@startuml
+autonumber
+
+<style>
+sequenceDiagram {
+    box {
+        Padding 10
+    }
+    participant {
+        Padding 10
+    }
+}
+</style>
+
+actor "Empresa Parceira" as Empresa
+box "Front-End (React)" #LightBlue
+    participant "DashboardEmpresaPage" as View
+    participant "AuthContext" as Auth
+    participant "api.ts (Axios)" as API
+end box
+
+box "Back-End (Spring Boot)" #LightCyan
+    participant "VantagemController" as Ctrl
+    participant "EmpresaParceiraRepository" as EmpRepo
+    participant "VantagemRepository" as VantRepo
+end box
+
+database "Banco de Dados" as DB #LightGray
+
+title UC06 - Cadastrar Vantagem
+
+Empresa -> View : Clica em "Nova Vantagem"
+activate View
+note over View : Abre o Modal de Cadastro\n(form limpo com emptyForm)
+
+Empresa -> View : Preenche os dados e clica em "Salvar"
+
+View -> Auth : Recupera ID da empresa logada (usuario.id)
+activate Auth
+Auth --> View : Retorna usuario.id
+deactivate Auth
+
+View -> View : buildPayload()
+note over View : Converte tipos (custo para Number)\ne trata quantidade/validade
+
+View -> API : criarVantagem(usuario.id, payload)
+activate API
+API -> Ctrl : POST /api/vantagens/empresa/{empresaId} (VantagemRequest)
+activate Ctrl
+
+Ctrl -> EmpRepo : findById(empresaId)
+activate EmpRepo
+EmpRepo -> DB : SELECT * FROM empresa_parceira WHERE id = ?
+activate DB
+DB --> EmpRepo : Dados da Empresa
+deactivate DB
+EmpRepo --> Ctrl : Optional<EmpresaParceira>
+deactivate EmpRepo
+
+alt Empresa Não Encontrada (Optional.isEmpty)
+    Ctrl --> API : 400 Bad Request (Map.of("erro", "..."))
+    API --> View : Erro capturado no catch
+    View -> View : setErro('Empresa não encontrada.')
+    note over View #Pink : Exibe toast vermelho no modal
+else Empresa Encontrada com Sucesso
+    Ctrl -> Ctrl : Instancia objeto Vantagem\ne mapeia atributos do Request
+    
+    Ctrl -> VantRepo : save(v)
+    activate VantRepo
+    VantRepo -> DB : INSERT INTO vantagem (...) VALUES (...)
+    activate DB
+    DB --> VantRepo : Vantagem com ID gerado
+    deactivate DB
+    VantRepo --> Ctrl : Vantagem salva
+    deactivate VantRepo
+    
+    Ctrl -> Ctrl : VantagemResponse.from(v)
+    note over Ctrl : Mapeia Entidade salva para DTO
+    
+    Ctrl --> API : 200 OK (VantagemResponse)
+    deactivate Ctrl
+    API --> View : Resposta de sucesso (Promise resolved)
+    deactivate API
+    
+    View -> View : setShowModal(false)
+    note over View : Fecha o modal de cadastro
+    
+    View -> API : listarVantagens(usuario.id)
+    activate API
+    API -> Ctrl : GET /api/vantagens/empresa/{empresaId}
+    activate Ctrl
+    
+    Ctrl -> VantRepo : findByEmpresaId(empresaId)
+    activate VantRepo
+    VantRepo -> DB : SELECT * FROM vantagem WHERE empresa_id = ?
+    activate DB
+    DB --> VantRepo : List<Vantagem>
+    deactivate DB
+    VantRepo --> Ctrl : List<Vantagem>
+    deactivate VantRepo
+    
+    Ctrl -> Ctrl : Mapeia lista para List<VantagemResponse>
+    Ctrl --> API : 200 OK (List<VantagemResponse>)
+    deactivate Ctrl
+    
+    API --> View : Retorna array de vantagens atualizado
+    deactivate API
+    
+    View -> View : setVantagens(data)
+    note over View #LightYellow : Estado atualizado: Gatilha re-render\ne atualiza os Cards de Métricas!
+end
+
+deactivate View
+@enduml

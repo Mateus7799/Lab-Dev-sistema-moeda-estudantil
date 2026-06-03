@@ -1,0 +1,82 @@
+@startuml
+skinparam actorStyle awesome
+
+skinparam package {
+    BackgroundColor #F8FAFC
+    BorderColor #CBD5E1
+}
+skinparam rectangle {
+    BackgroundColor #FFFFFF
+    BorderColor #94A3B8
+}
+skinparam usecase {
+    BackgroundColor #FFFBEB
+    BorderColor #D97706
+    ArrowColor #475569
+}
+
+' ── BLOCO DE ATORES  ───
+
+actor "Usuário Não Autenticado\n(Visitante)" as UserGeral
+
+package "Atores Autenticados" {
+    actor "Aluno" as Alun
+    actor "Professor" as Prof
+    actor "Empresa Parceira" as Emp
+}
+
+actor "Instituição de Ensino" as Inst
+
+Alun -up-|> UserGeral
+Prof -up-|> UserGeral
+Emp -up-|> UserGeral
+
+Emp -[hidden]down- Inst
+
+
+' ── BLOCO DO SISTEMA───
+left to right direction
+
+rectangle "Sistema de Moeda Estudantil" {
+    
+    (Efetuar Login) as UC_Login
+    (Cadastrar Aluno) as UC_CadAlun
+    (Cadastrar Empresa) as UC_CadEmp
+    (Cadastrar Professor) as UC_CadProf
+    
+    (Consultar Extrato) as UC_Extrato
+    (Distribuir Moedas) as UC_Doar
+    (Resgatar Vantagem) as UC_Resgate
+    (Gerenciar Vantagens) as UC_Vantagens
+    
+    ' Extensões
+    (Filtrar Extrato) as UC_Filtro
+    (Pesquisar Vantagem) as UC_pesq
+
+    ' ── ASSOCIAÇÕES DIRETA ──
+    
+    UserGeral --> UC_Login
+    UserGeral --> UC_CadAlun
+    UserGeral --> UC_CadEmp
+    
+    Inst --> UC_CadProf
+
+    Alun --> UC_Extrato
+    Alun --> UC_Resgate
+    
+    Prof --> UC_Doar
+    Prof --> UC_Extrato
+    
+    Emp --> UC_Vantagens
+    
+    ' ── RELACIONAMENTOS Inclusões e Extensões ──
+    
+    UC_Extrato .[#94A3B8].> UC_Login : <<include>>
+    UC_Doar .[#94A3B8].> UC_Login : <<include>>
+    UC_Resgate .[#94A3B8].> UC_Login : <<include>>
+    UC_Vantagens .[#94A3B8].> UC_Login : <<include>>
+    
+    UC_Extrato <.left. UC_Filtro : <<extend>>
+    UC_Vantagens <.left. UC_pesq : <<extend>>
+}
+@enduml

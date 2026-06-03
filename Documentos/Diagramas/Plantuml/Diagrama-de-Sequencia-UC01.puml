@@ -1,0 +1,87 @@
+@startuml
+<style>
+sequenceDiagram {
+    participant {
+        Padding 15
+    }
+    box {
+        Padding 10
+    }
+}
+</style>
+
+skinparam linestyle ortho
+
+
+skinparam ActorBackgroundColor #FFFBEB
+skinparam ActorBorderColor #D97706
+skinparam SequenceBoxBackgroundColor #F8FAFC
+skinparam SequenceBoxBorderColor #CBD5E1
+skinparam SequenceGroupBackgroundColor #FFFFFF
+skinparam SequenceGroupHeaderBackgroundColor #F1F5F9
+
+actor "Usuário" as User
+
+box "Camada Front-End (React)" #EFF6FF
+    participant "LoginPage" as LoginUI <<Component>>
+    participant "api (services)" as APIClient <<Module>>
+    participant "AuthContext" as AuthCtx <<Provider>>
+box end
+
+box "Camada Back-End (Spring Boot)" #F0FDF4
+    participant "AuthController" as AuthCtrl <<RestController>>
+    participant "UsuarioRepository" as UserRepo <<Interface>>
+box end
+
+database "Banco de Dados" as DB #F8FAFC
+
+User -> LoginUI : Preenche E-mail/Senha e clica em "Entrar"
+activate LoginUI
+
+LoginUI -> LoginUI : handleSubmit(e)\nsetLoading(true)
+
+LoginUI -> APIClient : login(email, senha)
+activate APIClient
+
+APIClient -> AuthCtrl : POST /api/auth/login\n[RequestBody: LoginRequest]
+activate AuthCtrl
+
+AuthCtrl -> UserRepo : findByEmail(request.getEmail())
+activate UserRepo
+
+UserRepo -> DB : SELECT * FROM usuarios WHERE email = ?
+activate DB
+DB --> UserRepo : Registro do Usuário (ou vazio)
+deactivate DB
+
+UserRepo --> AuthCtrl : Optional<Usuario>
+deactivate UserRepo
+
+alt Usuário não encontrado OU Senha incorreta
+    AuthCtrl --> APIClient : ResponseEntity.status(401)\n[Body: {"erro": "E-mail ou senha inválidos."}]
+    APIClient --> LoginUI : Lança erro (data.erro)
+    LoginUI -> LoginUI : setErro("E-mail ou senha inválidos.")\nsetLoading(false)
+    LoginUI --> User : Exibe mensagem de erro na tela
+    
+else Credenciais Válidas
+    AuthCtrl -> AuthCtrl : UsuarioResponse.from(usuario)
+    AuthCtrl --> APIClient : ResponseEntity.ok(UsuarioResponse)
+    deactivate AuthCtrl
+    
+    APIClient --> LoginUI : Retorna objeto Usuario (cast)
+    deactivate APIClient
+
+    LoginUI -> AuthCtx : login(usuario)
+    activate AuthCtx
+    note over AuthCtx : Salva o estado do usuário\nautenticado globalmente
+    AuthCtx --> LoginUI
+    deactivate AuthCtx
+
+    note over LoginUI : Identifica tipo de perfil:\nALUNO, PROFESSOR ou EMPRESA
+    
+    LoginUI -> LoginUI : navigate(rotas[usuario.tipo])\nsetLoading(false)
+    LoginUI --> User : Redireciona e exibe a Dashboard correspondente
+end
+deactivate LoginUI
+
+@enduml

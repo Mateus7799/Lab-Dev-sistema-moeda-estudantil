@@ -1,0 +1,78 @@
+@startuml
+autonumber
+
+<style>
+sequenceDiagram {
+    box {
+        Padding 10
+    }
+    participant {
+        Padding 10
+    }
+}
+</style>
+
+actor "Aluno (Autenticado)" as Aluno
+box "Front-End (React)" #LightBlue
+    participant "VantagensPage" as View
+    participant "AuthContext" as Auth
+    participant "api.ts (Axios)" as API
+end box
+
+box "Back-End (Spring Boot)" #LightCyan
+    participant "VantagemController" as Ctrl
+    participant "VantagemRepository" as VantRepo
+    participant "CupomRepository" as CupomRepo
+end box
+
+database "Banco de Dados" as DB #LightGray
+
+title UC07 - Visualizar Vantagens e Cupons Resgatados
+
+== Inicialização da Página (Carregamento) ==
+
+Aluno -> View : 1. Acessa a Loja/Painel de Vantagens
+activate View
+
+View -> Auth : 2. Recupera dados da sessão (usuario.id)
+activate Auth
+Auth --> View : 3. Retorna usuario.id e saldoAtual
+deactivate Auth
+
+View -> API : 4. listarTodasVantagens() e listarMeusCupons(usuario.id)
+activate API
+
+API -> Ctrl : 5. GET /api/vantagens (Listar Ativas)
+activate Ctrl
+Ctrl -> VantRepo : findByAtivaTrue()
+activate VantRepo
+VantRepo -> DB : SELECT * FROM vantagem WHERE ativa = true
+activate DB
+DB --> VantRepo : Lista de Vantagens
+deactivate DB
+VantRepo --> Ctrl : List<Vantagem>
+deactivate VantRepo
+Ctrl --> API : 200 OK (List<VantagemResponse>)
+
+API -> Ctrl : 6. GET /api/cupons/aluno/{alunoId}
+Ctrl -> CupomRepo : findByAlunoId(alunoId)
+activate CupomRepo
+CupomRepo -> DB : SELECT * FROM cupom WHERE aluno_id = ?
+activate DB
+DB --> CupomRepo : Lista de Cupons (Código, Data, Empresa)
+deactivate DB
+CupomRepo --> Ctrl : List<Cupom>
+deactivate CupomRepo
+Ctrl --> API : 200 OK (List<CupomResponse>)
+deactivate Ctrl
+
+API --> View : 7. Retorna dados combinados (Vantagens e Cupons)
+deactivate API
+
+View -> View : setVantagens(data.vantagens)\nsetMeusCupons(data.cupons)
+note over View #LightYellow : Renderiza os cards de vantagens\ne a tabela com os códigos de cupons já gerados
+
+View --> Aluno : 8. Exibe a tela montada com saldo e listagens atualizadas
+deactivate View
+
+@enduml
