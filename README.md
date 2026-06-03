@@ -24,6 +24,8 @@ O projeto está sendo desenvolvido como parte da disciplina **Laboratório de De
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-%23FF6600.svg?style=for-the-badge&logo=rabbitmq&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
+</div>
+
 
 ---
 
