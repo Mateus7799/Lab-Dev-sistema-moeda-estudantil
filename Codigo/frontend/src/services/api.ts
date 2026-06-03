@@ -90,6 +90,12 @@ export const api = {
       body: JSON.stringify(payload) 
     }),
 
+  cadastrarProfessor: (payload: object) =>
+  request('/professores', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+
   /** Extrato de envios efetuados pelo professor */
   extratoDosProfessor: (professorId: number) =>
     request(`/transacoes/professor/${professorId}`),
