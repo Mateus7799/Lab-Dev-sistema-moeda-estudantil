@@ -1,25 +1,41 @@
 # 🏷️ Sistema de moeda estudantil
 
-Sistema web desenvolvido para gerenciar o moeda virtual, com o intuido de estimular o reconhecimento do mérito estudantil.
+Sistema web desenvolvido para gerenciar o moeda virtual, com o intuito de estimular o reconhecimento do mérito estudantil.
 O projeto está sendo desenvolvido como parte da disciplina **Laboratório de Desenvolvimento de Software**.
 
 ---
 
 ## 🚧 Status do Projeto
 
-![Status](https://img.shields.io/badge/status-in%20development-yellow)
-![Version](https://img.shields.io/badge/version-0.1-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Progress](https://img.shields.io/badge/progress-initial-lightgrey)
-[![GitHub repo size](https://img.shields.io/github/repo-size/Mateus7799/Lab-02-Sistema-de-Aluguel-de-Carros?style=for-the-badge)](https://github.com/Mateus7799/Lab-02-Sistema-de-Aluguel-de-Carros.git)
+<div align="center">
+
+![Status](https://img.shields.io/badge/STATUS-EM%20DESENVOLVIMENTO-yellow?style=for-the-badge)
+![Versão](https://img.shields.io/badge/VERS%C3%83O-0.1-blue?style=for-the-badge)
+![Licença](https://img.shields.io/badge/LICEN%C3%87A-MIT-green?style=for-the-badge)
+[![GitHub repo size](https://img.shields.io/github/repo-size/Mateus7799/Lab-02-Sistema-de-Aluguel-de-Carros?style=for-the-badge)](https://github.com/Mateus7799/Lab-Dev-sistema-moeda-estudantil.git)
+
+</div>
+
+<div align="center">
+
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-%23FF6600.svg?style=for-the-badge&logo=rabbitmq&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+
 
 ---
 
 ## 📚 Índice
 - [Sobre o Projeto](#sobre-o-projeto)
-- [Diagramas](#-diagramas)
-- [Funcionalidades](#-funcionalidades-principais)
-- [Autores](#-autores)
+- [Principais Características](#principais-características)
+- [Diagramas](#diagramas)
+- [Casos de Uso](#casos-de-uso)
+- [Funcionalidades Principais](#funcionalidades-principais)
+- [Autores](#autores)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Como Executar](#-como-executar)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 
 
@@ -27,25 +43,27 @@ O projeto está sendo desenvolvido como parte da disciplina **Laboratório de De
 ---
 ## 📝 Sobre o Projeto
 
-Este projeto consiste no desenvolvimento de um sistema web para gerenciamento de ummoeda virtual, com o intuido de estimular o reconhecimento do mérito estudantil.
+Este projeto consiste no desenvolvimento de um sistema web para gerenciamento de uma moeda virtual, com o intuido de estimular o reconhecimento do mérito estudantil.
 O sistema foi projetado com foco em organização, modularidade e clareza estrutural, utilizando conceitos de engenharia de software como modelagem UML, separação de responsabilidades e planejamento orientado a boas práticas de desenvolvimento.
 
 Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de Desenvolvimento de Software**, com o objetivo de aplicar na prática os conceitos estudados ao longo do curso.
 
 
+
 ## 📌 Principais características
 
-- Arquitetura Full Stack com React e Spring Boot
-- Integração entre frontend e backend via API REST
-- Persistência de dados utilizando PostgreSQL
-- Containerização da aplicação com Docker
+- **Arquitetura Full Stack:** Frontend robusto em React e backend escalável com Spring Boot.
+- **Comunicação Segura:** Integração via API REST utilizando Axios e configurações de segurança de CORS.
+- **Persistência Confiável:** Modelagem e mapeamento relacional robusto utilizando Spring Data JPA e banco de dados PostgreSQL.
+- **Processamento Assíncrono:** Arquitetura orientada a eventos utilizando RabbitMQ para garantir resgates de vantagens sem travamento da UI e com alta consistência.
+- **Ambiente Isolado:** Containerização completa da aplicação e banco de dados via Docker e Docker Compose, facilitando o deploy e execução.
 
 ---
 
 ## 📷 Diagramas
 
 ### Diagrama de Casos de Uso
-![Casos de Uso](Documentos/Diagramas/Imagens/Diagrma-Casos-de-Uso.png)
+![Casos de Uso](Documentos/Diagramas/Imagens/Diagrama-de-Casos-de-Uso-v3.png)
 
 
 ### Diagrama de Classes
@@ -60,6 +78,36 @@ Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de
 ![Pacotes](Documentos/Diagramas/Imagens/Modelo-ER.png)
 
 
+
+
+---
+
+
+## 🎬 Casos de Uso (Diagramas de Sequência)
+
+### UC01 - Cadastrar Aluno
+![UC01](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-UC01.png)
+
+### UC02 - Cadastrar Empresa Parceira
+![UC02](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-UC02.png)
+
+### UC03 - Login / Autenticação
+![UC03](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-UC03.png)
+
+### UC04 - Consultar Extrato (Aluno)
+![UC04](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-UC04.png)
+
+### UC05 - Enviar Moedas (Professor para Aluno)
+![UC05](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-UC05.png)
+
+### UC06 - Cadastrar Vantagem (Empresa)
+![UC06](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-UC06.png)
+
+### UC07 - Visualizar Vantagens e Cupons Resgatados (Aluno)
+![UC07](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-UC07.png)
+
+### UC08 - Resgatar Vantagem (Processamento Assíncrono)
+![UC08](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-UC08.png)
 
 
 ---
@@ -302,6 +350,7 @@ docker-compose down
 - Spring Web
 - Spring Data JPA
 - Maven
+- Spring AMQP (RabbitMQ)
 
 ## Banco de Dados
 
