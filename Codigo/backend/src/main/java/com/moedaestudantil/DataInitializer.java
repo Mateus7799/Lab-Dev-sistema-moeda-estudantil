@@ -2,9 +2,11 @@ package com.moedaestudantil;
 
 import com.moedaestudantil.model.Aluno;
 import com.moedaestudantil.model.Instituicao;
+import com.moedaestudantil.model.Professor;
 import com.moedaestudantil.model.Usuario;
 import com.moedaestudantil.repository.AlunoRepository;
 import com.moedaestudantil.repository.InstituicaoRepository;
+import com.moedaestudantil.repository.ProfessorRepository;
 import com.moedaestudantil.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +22,15 @@ public class DataInitializer implements CommandLineRunner {
     private final AlunoRepository alunoRepository;
     private final UsuarioRepository usuarioRepository;
     private final InstituicaoRepository instituicaoRepository;
+    private final ProfessorRepository professorRepository;
 
     public DataInitializer(AlunoRepository alunoRepository,
-                           UsuarioRepository usuarioRepository,
-                           InstituicaoRepository instituicaoRepository) {
+            UsuarioRepository usuarioRepository,
+            InstituicaoRepository instituicaoRepository, ProfessorRepository professorRepository) {
         this.alunoRepository = alunoRepository;
         this.usuarioRepository = usuarioRepository;
         this.instituicaoRepository = instituicaoRepository;
+        this.professorRepository = professorRepository;
     }
 
     @Override
@@ -70,6 +74,24 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Segundo aluno de testes criado: {} | saldo: 9999 moedas", segundoEmail);
         } else {
             log.info("Usuário de testes 2 já existe, ignorando seed.");
+        }
+
+        String professorEmail = "professor.teste@sistema.local";
+        if (!usuarioRepository.findByEmail(professorEmail).isPresent()) {
+            Professor professor = new Professor();
+            professor.setNome("Professor de Testes");
+            professor.setEmail(professorEmail);
+            professor.setSenha("123456");
+            professor.setTipo(Usuario.TipoUsuario.PROFESSOR);
+            professor.setCpf("22222222222");
+            professor.setDepartamento("Computação");
+            professor.setSaldoMoedas(1000);
+            professor.setInstituicao(inst);
+
+            professorRepository.save(professor);
+            log.info("Professor de testes criado: {}", professorEmail);
+        } else {
+            log.info("Professor de testes já existe, ignorando seed.");
         }
     }
 }
