@@ -1,0 +1,104 @@
+@startuml Diagrama de Sequencia Geral - Sistema de Moedas
+
+<style>
+sequenceDiagram {
+    boxPadding 10
+    participantPadding 10
+}
+</style>
+
+skinparam style strictuml
+
+actor Aluno as "Aluno (Cliente)"
+
+box "Front-End (React)" #LightBlue
+    participant Front as "Componente Loja / Vantagens"
+end box
+
+box "Back-End (Spring Boot)" #LightGreen
+    participant VantagemCtrl as "VantagemController"
+    participant ResgateCtrl as "ResgateController"
+    participant Producer as "ResgateProducer"
+    participant Consumer as "ResgateConsumer"
+    participant Service as "ResgateService"
+end box
+
+box "Mensageria" #LightGray
+    control Fila as "vantagens.resgate.queue (RabbitMQ)"
+end box
+
+box "Banco de Dados" #LightYellow
+    database Banco as "PostgreSQL"
+end box
+
+autonumber
+
+== FLUXO 1: Listagem de Vantagens Disponíveis ==
+
+Aluno -> Front: Acessa a página de Vantagens
+activate Front
+    Front -> VantagemCtrl: GET /api/vantagens (Solicita lista)
+    activate VantagemCtrl
+        VantagemCtrl -> Banco: Buscar vantagens ativas
+        activate Banco
+        Banco --> VantagemCtrl: Retorna lista de vantagens
+        deactivate Banco
+    VantagemCtrl --> Front: 200 OK (JSON com as Vantagens)
+    deactivate VantagemCtrl
+    Front --> Aluno: Renderiza os cards de vantagens na tela
+deactivate Front
+
+== FLUXO 2: Solicitação e Processamento Assíncrono de Resgate ==
+
+Aluno -> Front: Clicar em "Resgatar Vantagem"
+activate Front
+    Front -> ResgateCtrl: POST /api/resgates (alunoId, vantagemId)
+    activate ResgateCtrl
+        
+        note over ResgateCtrl: Início do fluxo assíncrono (RabbitMQ)
+        
+        ResgateCtrl -> Producer: enviarParaFila(request)
+        activate Producer
+            Producer -> Fila: Publica Pedido de Resgate (Payload)
+        deactivate Producer
+        
+        ResgateCtrl --> Front: 202 Accepted (Mensagem: "Processando resgate...")
+    deactivate ResgateCtrl
+    
+    Front --> Aluno: Exibe Toast/Modal: "Seu resgate está sendo processado!"
+deactivate Front
+
+
+== FLUXO 3: Consumo da Fila e Regra de Negócio ==
+
+Fila -> Consumer: Dispara evento / Entrega Mensagem
+activate Consumer
+    
+    Consumer -> Service: efetuarTroca(alunoId, vantagemId)
+    activate Service
+        Service -> Banco: Buscar Aluno e Vantagem
+        activate Banco
+        Banco --> Service: Retorna entidades do banco
+        deactivate Banco
+        
+        alt Saldo do Aluno >= Custo da Vantagem
+            Service -> Service: Deduz custo do saldo do Aluno
+            Service -> Banco: Atualiza saldo do Aluno (save)
+            activate Banco
+            deactivate Banco
+            
+            Service -> Banco: Cria e persiste o registro do Cupom
+            activate Banco
+            deactivate Banco
+            
+            Service --> Consumer: Resgate finalizado com sucesso
+        else Saldo Insuficiente
+            Service --> Consumer: Lança exceção / Erro de Saldo
+        end
+        
+    deactivate Service
+    
+    Consumer -> Fila: ACK (Confirmação de mensagem processada)
+deactivate Consumer
+
+@enduml
