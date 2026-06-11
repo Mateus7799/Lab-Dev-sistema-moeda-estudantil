@@ -87,6 +87,9 @@ Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de
 
 ## 🎬 Casos de Uso (Diagramas de Sequência)
 
+### Geral - Diagrama Geral
+![UC01](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-Geral.png)
+
 ### UC01 - Cadastrar Aluno
 ![UC01](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-UC01.png)
 
