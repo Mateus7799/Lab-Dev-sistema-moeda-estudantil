@@ -1,4 +1,4 @@
-@startuml Diagrama de Sequencia Geral - Sistema de Moedas
+@startuml Diagrama de Sequencia Geral - Meritum
 
 <style>
 sequenceDiagram {
@@ -8,19 +8,27 @@ sequenceDiagram {
 </style>
 
 skinparam style strictuml
+skinparam linestyle ortho
 
-actor Aluno as "Aluno (Cliente)"
+actor "Usuário (Aluno/Professor)" as User
 
 box "Front-End (React)" #LightBlue
-    participant Front as "Componente Loja / Vantagens"
+    participant UI as "Páginas / Componentes"
+    participant Auth as "AuthContext (Sessão)"
+    participant API as "api.ts (Axios)"
+end box
+
+box "Serviço Externo" #F5F5F5
+    participant ViaCEP as "ViaCEP API"
 end box
 
 box "Back-End (Spring Boot)" #LightGreen
-    participant VantagemCtrl as "VantagemController"
+    participant AuthCtrl as "AuthController"
+    participant TxCtrl as "TransacaoController"
     participant ResgateCtrl as "ResgateController"
-    participant Producer as "ResgateProducer"
-    participant Consumer as "ResgateConsumer"
-    participant Service as "ResgateService"
+    participant Prod as "ResgateProducer"
+    participant Cons as "ResgateConsumer"
+    participant Serv as "ResgateService"
 end box
 
 box "Mensageria" #LightGray
@@ -33,72 +41,99 @@ end box
 
 autonumber
 
-== FLUXO 1: Listagem de Vantagens Disponíveis ==
+== FLUXO A: Autenticação, Cadastro e Verificação de Endereço ==
 
-Aluno -> Front: Acessa a página de Vantagens
-activate Front
-    Front -> VantagemCtrl: GET /api/vantagens (Solicita lista)
-    activate VantagemCtrl
-        VantagemCtrl -> Banco: Buscar vantagens ativas
-        activate Banco
-        Banco --> VantagemCtrl: Retorna lista de vantagens
-        deactivate Banco
-    VantagemCtrl --> Front: 200 OK (JSON com as Vantagens)
-    deactivate VantagemCtrl
-    Front --> Aluno: Renderiza os cards de vantagens na tela
-deactivate Front
+opt Se Aluno Novo (Fluxo UC02)
+    User -> UI: Digita CEP no formulário de Cadastro
+    activate UI
+    UI -> ViaCEP: GET https://viacep.com.br/ws/{cep}/json/
+    activate ViaCEP
+    ViaCEP --> UI: Retorna dados do endereço (Rua, Bairro, Cidade)
+    deactivate ViaCEP
+    UI -> API: api.cadastrarAluno(payload)
+    activate API
+    API -> Banco: INSERT INTO usuarios/aluno
+    API --> UI: Sucesso (UsuarioResponse)
+    deactivate API
+end
 
-== FLUXO 2: Solicitação e Processamento Assíncrono de Resgate ==
+User -> UI: Preenche E-mail/Senha e clica em "Entrar"
+UI -> API: api.login(email, senha)
+activate API
+API -> AuthCtrl: POST /api/auth/login
+activate AuthCtrl
+AuthCtrl -> Banco: SELECT * FROM usuarios WHERE email = ?
+activate Banco
+Banco --> AuthCtrl: Registro do Usuário
+deactivate Banco
+AuthCtrl --> API: 200 OK (UsuarioResponse)
+deactivate AuthCtrl
+API --> UI: Retorna objeto Usuario
+deactivate API
 
-Aluno -> Front: Clicar em "Resgatar Vantagem"
-activate Front
-    Front -> ResgateCtrl: POST /api/resgates (alunoId, vantagemId)
-    activate ResgateCtrl
-        
-        note over ResgateCtrl: Início do fluxo assíncrono (RabbitMQ)
-        
-        ResgateCtrl -> Producer: enviarParaFila(request)
-        activate Producer
-            Producer -> Fila: Publica Pedido de Resgate (Payload)
-        deactivate Producer
-        
-        ResgateCtrl --> Front: 202 Accepted (Mensagem: "Processando resgate...")
-    deactivate ResgateCtrl
+UI -> Auth: login(usuario)
+activate Auth
+note over Auth: Armazena o estado do\nuário globalmente (Nome, Saldo, Perfil)
+Auth --> UI
+deactivate Auth
+UI --> User: Redireciona para a Dashboard correspondente
+
+== FLUXO B: Envio de Moedas (Professor para Aluno) ==
+
+User -> UI: Professor define quantidade e mensagem para o Aluno
+UI -> API: api.enviarMoedas(payload)
+activate API
+API -> TxCtrl: POST /api/transacoes/enviar\n[RequestBody: EnviarMoedasRequest]
+activate TxCtrl
+TxCtrl -> Banco: UPDATE professor SET saldo ... UPDATE aluno SET saldo ...
+activate Banco
+TxCtrl -> Banco: INSERT INTO transacao (...)
+Banco --> TxCtrl: Confirmação de persistência
+deactivate Banco
+TxCtrl --> API: 200 OK (TransacaoResponse)
+deactivate TxCtrl
+API --> UI: Retorna dados da transação concluída
+deactivate API
+
+UI -> Auth: login({ ...usuario, saldoMoedas: novoSaldo })
+note over UI, Auth: Sincroniza o novo saldo do professor em tempo real
+UI --> User: Exibe Toast de sucesso e atualiza tabela de histórico
+
+== FLUXO C: Solicitação e Processamento Assíncrono de Resgate ==
+
+User -> UI: Aluno clica em "Resgatar Vantagem"
+UI -> API: api.resgatar(alunoId, vantagemId)
+activate API
+API -> ResgateCtrl: POST /api/resgates\n[Body: ResgateRequest]
+activate ResgateCtrl
     
-    Front --> Aluno: Exibe Toast/Modal: "Seu resgate está sendo processado!"
-deactivate Front
-
-
-== FLUXO 3: Consumo da Fila e Regra de Negócio ==
-
-Fila -> Consumer: Dispara evento / Entrega Mensagem
-activate Consumer
+    note over ResgateCtrl: Início do fluxo assíncrono (RabbitMQ)
     
-    Consumer -> Service: efetuarTroca(alunoId, vantagemId)
-    activate Service
-        Service -> Banco: Buscar Aluno e Vantagem
-        activate Banco
-        Banco --> Service: Retorna entidades do banco
-        deactivate Banco
-        
-        alt Saldo do Aluno >= Custo da Vantagem
-            Service -> Service: Deduz custo do saldo do Aluno
-            Service -> Banco: Atualiza saldo do Aluno (save)
-            activate Banco
-            deactivate Banco
-            
-            Service -> Banco: Cria e persiste o registro do Cupom
-            activate Banco
-            deactivate Banco
-            
-            Service --> Consumer: Resgate finalizado com sucesso
-        else Saldo Insuficiente
-            Service --> Consumer: Lança exceção / Erro de Saldo
-        end
-        
-    deactivate Service
+    ResgateCtrl -> Prod: enviarParaFila(request)
+    activate Prod
+        Prod -> Fila: Publica Pedido de Resgate (Payload)
+    deactivate Prod
     
-    Consumer -> Fila: ACK (Confirmação de mensagem processada)
-deactivate Consumer
+    ResgateCtrl --> API: 202 Accepted ({"mensagem": "Processando resgate..."})
+deactivate ResgateCtrl
+API --> UI: Retorna HTTP 202 (Promise Resolved)
+deactivate API
+
+UI --> User: Exibe Toast: "Seu resgate está sendo processado!"
+note over UI: Aguarda 800ms e recarrega a lista de cupons automaticamente
+
+
+Fila -> Cons: 10. @RabbitListener captura ResgateMessage
+activate Cons
+Cons -> Serv: processarResgate(alunoId, vantagemId)
+activate Serv
+Serv -> Banco: Valida saldo e atualiza tabelas (aluno, vantagem, resgate)
+activate Banco
+Banco --> Serv: Registro de Resgate Salvo (Cupom gerado)
+deactivate Banco
+Serv --> Cons: Resgate finalizado com sucesso
+deactivate Serv
+Cons -> Fila: ACK (Confirmação de recebimento)
+deactivate Cons
 
 @enduml
