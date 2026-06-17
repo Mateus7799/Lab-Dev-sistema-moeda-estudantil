@@ -96,6 +96,9 @@ export const api = {
     body: JSON.stringify(payload),
   }),
 
+  listarProfessores: () =>
+    request('/professores'),
+
   /** Extrato de envios efetuados pelo professor */
   extratoDosProfessor: (professorId: number) =>
     request(`/transacoes/professor/${professorId}`),
@@ -127,13 +130,17 @@ export const api = {
   resgatesDoAluno: (alunoId: number) =>
     request(`/resgates/aluno/${alunoId}`),
 
+  /** Marca cupom como USADO ao escanear o QR Code */
+  usarCupom: (resgateId: number) =>
+    request(`/resgates/${resgateId}/usar`, { method: 'PUT' }),
+
   /** Lista de resgates pendentes/confirmados para controle da empresa parceira */
   resgatesDaEmpresa: (empresaId: number) =>
     request(`/resgates/empresa/${empresaId}`),
 
   /** Empresa confirma a entrega física/uso da vantagem através do código do cupom */
   confirmarResgate: (resgateId: number) =>
-    request(`/resgates/${resgateId}/confirmar`, { 
-      method: 'PUT' 
+    request(`/resgates/${resgateId}/confirmar`, {
+      method: 'PUT'
     }),
 };
