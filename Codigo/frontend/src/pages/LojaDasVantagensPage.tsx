@@ -56,8 +56,8 @@ function CupomHistoricoCard({ r, statusConfig }: {
             <p className="text-xs text-gray-400 font-mono">#{r.codigoCupom}</p>
           ) : (
             <div className="bg-white border border-gray-100 rounded-lg p-2 inline-flex flex-col items-center gap-1">
-              <QRCodeSVG value={String(r.id)} size={80} level="M" includeMargin={false} />
-              <p className="text-xs text-gray-400">Escaneie para resgatar</p>
+              <QRCodeSVG value={`${window.location.origin}/cupom/${r.codigoCupom}`} size={80} level="M" includeMargin={false} />
+              <p className="text-xs text-gray-400">Escaneie para ver o cupom</p>
             </div>
           )}
 
@@ -131,7 +131,19 @@ export function LojaDasVantagensPage() {
       setToast(`Seu resgate de "${vantagem.nome}" está sendo processado!`);
       setTimeout(() => setToast(''), 5000);
 
-      setTimeout(() => carregarResgates(), 800);
+      // Poll until the new resgate appears (up to 5s)
+      let tentativas = 0;
+      const poll = () => {
+        tentativas++;
+        (api.resgatesDoAluno(alunoId) as Promise<Resgate[]>)
+          .then(lista => {
+            setResgates(lista);
+            const apareceu = lista.some(r => r.vantagemId === vantagem.id);
+            if (!apareceu && tentativas < 5) setTimeout(poll, 1000);
+          })
+          .catch(() => {});
+      };
+      setTimeout(poll, 800);
     } catch (err: unknown) {
       setErro(err instanceof Error ? err.message : 'Erro ao resgatar.');
     } finally {
