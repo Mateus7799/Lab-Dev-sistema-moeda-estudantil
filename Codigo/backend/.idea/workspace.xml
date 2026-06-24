@@ -6,32 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="91009af3-fe9c-45df-9046-dc37caf2bfa1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/controller/PerfilController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/controller/PerfilController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/controller/ProfessorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/controller/ProfessorController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/controller/ResgateController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/controller/ResgateController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/controller/TransacaoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/controller/TransacaoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/controller/VantagemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/controller/VantagemController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/dto/UsuarioResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/dto/UsuarioResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/model/EmpresaParceira.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/model/EmpresaParceira.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/repository/ResgateRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/repository/ResgateRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/repository/TransacaoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/repository/TransacaoRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/service/ResgateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/moedaestudantil/service/ResgateService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/DashboardEmpresaPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/DashboardEmpresaPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/DashboardProfessorPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/DashboardProfessorPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/EnviarMoedasPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/EnviarMoedasPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/ExtratoPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/ExtratoPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/LoginPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/LoginPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/LojaDasVantagensPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/LojaDasVantagensPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/PerfilAlunoPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/PerfilAlunoPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/PerfilEmpresaPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/PerfilEmpresaPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/pages/VantagensPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/pages/VantagensPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/services/api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/services/api.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/services/emailService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/services/emailService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/types/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
