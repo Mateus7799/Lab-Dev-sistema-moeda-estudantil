@@ -1,0 +1,87 @@
+@startuml Diagrama_de_Comunicacao_Meritum
+
+skinparam style strictuml
+skinparam linestyle ortho
+
+actor "Usuário (Aluno/Professor)" as User
+
+box "Front-End (React)" #LightBlue
+    participant UI as "Páginas / Componentes"
+    participant Auth as "AuthContext"
+    participant API as "api.ts"
+end box
+
+box "Serviço Externo" #F5F5F5
+    participant ViaCEP as "ViaCEP API"
+end box
+
+box "Back-End (Spring Boot)" #LightGreen
+    participant AuthCtrl as "AuthController"
+    participant TxCtrl as "TransacaoController"
+    participant ResgateCtrl as "ResgateController"
+    participant Prod as "ResgateProducer"
+    participant Cons as "ResgateConsumer"
+    participant Serv as "ResgateService"
+end box
+
+box "Mensageria" #LightGray
+    participant Fila as "RabbitMQ"
+end box
+
+box "Banco de Dados" #LightYellow
+    participant Banco as "PostgreSQL"
+end box
+
+autonumber
+
+== Comunicação Geral ==
+
+User -> UI : 1. inserirCEP(cep)
+UI -> ViaCEP : 1.1 consultarCEP(cep)
+ViaCEP -> UI : 1.2 dadosEndereco
+UI -> API : 1.3 cadastrarAluno
+API -> Banco : 1.4 inserirUsuario
+Banco -> API : 1.5 confirmacao
+API -> UI : 1.6 usuarioCriado
+
+User -> UI : 2. login(email,senha)
+UI -> API : 2.1 login
+API -> AuthCtrl : 2.2 autenticar
+AuthCtrl -> Banco : 2.3 buscarUsuario
+Banco -> AuthCtrl : 2.4 dadosUsuario
+AuthCtrl -> API : 2.5 autenticado
+API -> UI : 2.6 retornoUsuario
+UI -> Auth : 2.7 armazenarSessao
+UI -> User : 2.8 dashboard
+
+User -> UI : 3. enviarMoedas
+UI -> API : 3.1 enviarMoedas
+API -> TxCtrl : 3.2 processarEnvio
+TxCtrl -> Banco : 3.3 atualizarSaldoProfessor
+TxCtrl -> Banco : 3.4 atualizarSaldoAluno
+TxCtrl -> Banco : 3.5 inserirTransacao
+Banco -> TxCtrl : 3.6 confirmacao
+TxCtrl -> API : 3.7 sucesso
+API -> UI : 3.8 dadosTransacao
+UI -> Auth : 3.9 atualizarSaldo
+UI -> User : 3.10 sucesso
+
+User -> UI : 4. solicitarResgate
+UI -> API : 4.1 resgatar
+API -> ResgateCtrl : 4.2 criarSolicitacao
+ResgateCtrl -> Prod : 4.3 enviarFila
+Prod -> Fila : 4.4 publicarMensagem
+ResgateCtrl -> API : 4.5 processamento
+API -> UI : 4.6 resposta202
+UI -> User : 4.7 aguardando
+
+Fila -> Cons : 5. consumirMensagem
+Cons -> Serv : 5.1 processarResgate
+Serv -> Banco : 5.2 validarSaldo
+Serv -> Banco : 5.3 atualizarSaldo
+Serv -> Banco : 5.4 registrarResgate
+Banco -> Serv : 5.5 confirmado
+Serv -> Cons : 5.6 sucesso
+Cons -> Fila : 5.7 ACK
+
+@enduml
