@@ -1,6 +1,6 @@
-# 🏷️ Sistema de moeda estudantil
+# 🏷️ Sistema de Moeda Estudantil
 
-Sistema web desenvolvido para gerenciar o moeda virtual, com o intuito de estimular o reconhecimento do mérito estudantil.
+Sistema web desenvolvido para gerenciar a moeda virtual, com o intuito de estimular o reconhecimento do mérito estudantil.
 O projeto está sendo desenvolvido como parte da disciplina **Laboratório de Desenvolvimento de Software**.
 
 ---
@@ -10,9 +10,9 @@ O projeto está sendo desenvolvido como parte da disciplina **Laboratório de De
 <div align="center">
 
 ![Status](https://img.shields.io/badge/STATUS-EM%20DESENVOLVIMENTO-yellow?style=for-the-badge)
-![Versão](https://img.shields.io/badge/VERS%C3%83O-0.1-blue?style=for-the-badge)
+![Versão](https://img.shields.io/badge/VERS%C3%83O-1.0-blue?style=for-the-badge)
 ![Licença](https://img.shields.io/badge/LICEN%C3%87A-MIT-green?style=for-the-badge)
-[![GitHub repo size](https://img.shields.io/github/repo-size/Mateus7799/Lab-02-Sistema-de-Aluguel-de-Carros?style=for-the-badge)](https://github.com/Mateus7799/Lab-Dev-sistema-moeda-estudantil.git)
+[![GitHub repo size](https://img.shields.io/github/repo-size/Mateus7799/Lab-Dev-sistema-moeda-estudantil?style=for-the-badge)](https://github.com/Mateus7799/Lab-Dev-sistema-moeda-estudantil.git)
 
 </div>
 
@@ -26,12 +26,13 @@ O projeto está sendo desenvolvido como parte da disciplina **Laboratório de De
 
 </div>
 
-
 ---
 
 ## 📚 Índice
+
 - [Sobre o Projeto](#sobre-o-projeto)
 - [Principais Características](#principais-características)
+- [Deploy](#-deploy)
 - [Diagramas](#diagramas)
 - [Casos de Uso](#casos-de-uso)
 - [Funcionalidades Principais](#funcionalidades-principais)
@@ -40,19 +41,18 @@ O projeto está sendo desenvolvido como parte da disciplina **Laboratório de De
 - [Como Executar](#-como-executar)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 
-
-
 ---
+
 ## 📝 Sobre o Projeto
 
-Este projeto consiste no desenvolvimento de um sistema web para gerenciamento de uma moeda virtual, com o intuido de estimular o reconhecimento do mérito estudantil.
+Este projeto consiste no desenvolvimento de um sistema web para gerenciamento de uma moeda virtual, com o intuito de estimular o reconhecimento do mérito estudantil.
 O sistema foi projetado com foco em organização, modularidade e clareza estrutural, utilizando conceitos de engenharia de software como modelagem UML, separação de responsabilidades e planejamento orientado a boas práticas de desenvolvimento.
 
 Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de Desenvolvimento de Software**, com o objetivo de aplicar na prática os conceitos estudados ao longo do curso.
 
+---
 
-
-## 📌 Principais características
+## 📌 Principais Características
 
 - **Arquitetura Full Stack:** Frontend robusto em React e backend escalável com Spring Boot.
 - **Comunicação Segura:** Integração via API REST utilizando Axios e configurações de segurança de CORS.
@@ -62,41 +62,46 @@ Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de
 
 ---
 
+## 🌐 Deploy
+
+A aplicação está disponível nos seguintes ambientes:
+
+| Serviço | URL |
+|---------|-----|
+| 🔵 Frontend (Vercel) | [lab-dev-sistema-moeda-estudantil.vercel.app](https://lab-dev-sistema-moeda-estudantil.vercel.app/) |
+| 🟢 Backend (Render) | [lab-dev-sistema-moeda-estudantil-zkca.onrender.com](https://lab-dev-sistema-moeda-estudantil-zkca.onrender.com) |
+| 🐘 Banco de Dados (Neon.tech) | PostgreSQL hospedado na Neon.tech |
+
+> ⚠️ **Atenção:** O backend está hospedado no plano gratuito do Render. Após períodos de inatividade, pode haver uma demora de até 1 minuto para a primeira resposta enquanto o serviço é reiniciado.
+
+---
+
 ## 📷 Diagramas
 
 ### Diagrama de Casos de Uso
 ![Casos de Uso](Documentos/Diagramas/Imagens/Diagrama-de-Casos-de-Uso-v3.png)
 
-
 ### Diagrama de Classes
-![Classes](Documentos/Diagramas/Imagens/Diagrama-de-classes.png) 
-
+![Classes](Documentos/Diagramas/Imagens/Diagrama-de-classes.png)
 
 ### Diagrama de Componentes
 ![Componentes](Documentos/Diagramas/Imagens/diagrama-componentes.png)
 
-
 ### Modelo ER
-![Pacotes](Documentos/Diagramas/Imagens/Modelo-ER.png)
-
+![Modelo ER](Documentos/Diagramas/Imagens/Modelo-ER.png)
 
 ### Implantação
-![Pacotes](Documentos/Diagramas/Imagens/Implantacao.png)
-
+![Implantação](Documentos/Diagramas/Imagens/Implantacao.png)
 
 ### Comunicação
-![Pacotes](Documentos/Diagramas/Imagens/Comunicacao.png)
-
-
-
+![Comunicação](Documentos/Diagramas/Imagens/Comunicacao.png)
 
 ---
 
-
 ## 🎬 Casos de Uso (Diagramas de Sequência)
 
-### Geral - Diagrama Geral
-![UC01](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-Geral.png)
+### Geral
+![Geral](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-Geral.png)
 
 ### UC01 - Cadastrar Aluno
 ![UC01](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-UC01.png)
@@ -122,7 +127,6 @@ Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de
 ### UC08 - Resgatar Vantagem (Processamento Assíncrono)
 ![UC08](Documentos/Diagramas/Imagens/Diagrama-de-Sequencia-UC08.png)
 
-
 ---
 
 ## ✨ Funcionalidades Principais
@@ -140,7 +144,8 @@ Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de
 - Bernardo Carvalho Denucci Mercado
 - Mateus Azevedo Araújo
 - Matheus Dias Mendes
-  
+
+---
 
 ## 📁 Estrutura do Projeto
 
@@ -257,6 +262,8 @@ Lab-Dev-sistema-moeda-estudantil/
 
 ```
 
+---
+
 # 🚀 Como Executar
 
 ## Frontend
@@ -325,7 +332,7 @@ http://localhost:8080
 
 ## Docker
 
-Na pasta Codigo execute:
+Na pasta `Codigo` execute:
 
 ```bash
 docker-compose up --build
@@ -348,7 +355,6 @@ docker-compose down
 # 🛠️ Tecnologias Utilizadas
 
 ## Frontend
-
 - React
 - TypeScript
 - Vite
@@ -357,7 +363,6 @@ docker-compose down
 - Axios
 
 ## Backend
-
 - Java 21
 - Spring Boot
 - Spring Web
@@ -366,12 +371,10 @@ docker-compose down
 - Spring AMQP (RabbitMQ)
 
 ## Banco de Dados
-
-- PostgreSQL
+- PostgreSQL (Neon.tech)
 
 ## DevOps
-
 - Docker
 - Docker Compose
-
----
+- Vercel (Frontend)
+- Render (Backend)
