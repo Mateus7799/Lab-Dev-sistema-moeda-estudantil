@@ -80,6 +80,14 @@ Este projeto está sendo desenvolvido como parte da disciplina **Laboratório de
 ![Pacotes](Documentos/Diagramas/Imagens/Modelo-ER.png)
 
 
+### Implantação
+![Pacotes](Documentos/Diagramas/Imagens/Implantacao.png)
+
+
+### Comunicação
+![Pacotes](Documentos/Diagramas/Imagens/Comunicacao.png)
+
+
 
 
 ---
