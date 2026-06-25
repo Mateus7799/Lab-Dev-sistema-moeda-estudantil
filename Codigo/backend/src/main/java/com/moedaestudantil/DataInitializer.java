@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class DataInitializer implements CommandLineRunner {
 
@@ -25,8 +27,9 @@ public class DataInitializer implements CommandLineRunner {
     private final ProfessorRepository professorRepository;
 
     public DataInitializer(AlunoRepository alunoRepository,
-            UsuarioRepository usuarioRepository,
-            InstituicaoRepository instituicaoRepository, ProfessorRepository professorRepository) {
+                           UsuarioRepository usuarioRepository,
+                           InstituicaoRepository instituicaoRepository,
+                           ProfessorRepository professorRepository) {
         this.alunoRepository = alunoRepository;
         this.usuarioRepository = usuarioRepository;
         this.instituicaoRepository = instituicaoRepository;
@@ -35,15 +38,28 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-            Instituicao inst = instituicaoRepository.findById(1L).orElse(null);
-            if (inst == null) {
-                inst = new Instituicao();
-                inst.setNome("Instituição de Teste"); // Ajuste conforme necessário
-                inst = instituicaoRepository.save(inst); // Agora inst tem um ID real
-                log.info("Instituição de teste criada automaticamente.");
-            }
+        // 1. Garantir que as Instituições existam
+        if (instituicaoRepository.count() == 0) {
+            Instituicao ufmg = new Instituicao();
+            ufmg.setNome("Universidade Federal de Minas Gerais (UFMG)");
+            instituicaoRepository.save(ufmg);
 
-        // 1. Criação do Primeiro Aluno de Teste (se não existir)
+            Instituicao puc = new Instituicao();
+            puc.setNome("Pontifícia Universidade Católica de Minas Gerais (PUC-MG)");
+            instituicaoRepository.save(puc);
+
+            Instituicao cefet = new Instituicao();
+            cefet.setNome("Centro Federal de Educação Tecnológica de Minas Gerais (CEFET-MG)");
+            instituicaoRepository.save(cefet);
+
+            log.info("Instituições padrão criadas com sucesso.");
+        }
+
+        // Recupera a primeira instituição para usar nos testes
+        List<Instituicao> instituicoes = instituicaoRepository.findAll();
+        Instituicao instDefault = instituicoes.get(0);
+
+        // 2. Criação dos Alunos e Professor
         if (!usuarioRepository.findByEmail(TEST_ALUNO_EMAIL).isPresent()) {
             Aluno testAluno = new Aluno();
             testAluno.setNome("Aluno de Testes");
@@ -53,51 +69,25 @@ public class DataInitializer implements CommandLineRunner {
             testAluno.setCpf("00000000000");
             testAluno.setCurso("Engenharia de Software");
             testAluno.setSaldoMoedas(9999);
-            testAluno.setInstituicao(inst);
-            testAluno.setIsTestUser(true); // Definimos o flag ANTES de salvar
-
-            alunoRepository.save(testAluno); // Apenas UMA chamada é suficiente
-            log.info("Aluno de testes criado: {} | saldo: 9999 moedas", TEST_ALUNO_EMAIL);
-        } else {
-            log.info("Usuário de testes 1 já existe, ignorando seed.");
+            testAluno.setInstituicao(instDefault);
+            testAluno.setIsTestUser(true);
+            alunoRepository.save(testAluno);
+            log.info("Aluno de testes 1 criado na instituição: {}", instDefault.getNome());
         }
 
-        // 2. Criação do SEGUNDO Aluno de Teste (se não existir)
-        String segundoEmail = "aluno.teste2@sistema.local";
-        if (!usuarioRepository.findByEmail(segundoEmail).isPresent()) {
-            Aluno testAluno2 = new Aluno();
-            testAluno2.setNome("Segundo Aluno de Testes");
-            testAluno2.setEmail(segundoEmail);
-            testAluno2.setSenha("123456"); // Mesma senha para facilitar
-            testAluno2.setTipo(Usuario.TipoUsuario.ALUNO);
-            testAluno2.setCpf("11111111111"); // CPF diferente para evitar problemas de constraint unique
-            testAluno2.setCurso("Engenharia de Software");
-            testAluno2.setSaldoMoedas(9999); // Super saldo também!
-            testAluno2.setInstituicao(inst);
-            testAluno2.setIsTestUser(true); // Mantém oculto igual ao primeiro
-
-            alunoRepository.save(testAluno2);
-            log.info("Segundo aluno de testes criado: {} | saldo: 9999 moedas", segundoEmail);
-        } else {
-            log.info("Usuário de testes 2 já existe, ignorando seed.");
-        }
-
-        String professorEmail = "professor.teste@sistema.local";
+        String professorEmail = "professor.teste@teste.com";
         if (!usuarioRepository.findByEmail(professorEmail).isPresent()) {
             Professor professor = new Professor();
-            professor.setNome("Professor de Testes");
+            professor.setNome("Prof. Carlos Silva");
             professor.setEmail(professorEmail);
             professor.setSenha("123456");
             professor.setTipo(Usuario.TipoUsuario.PROFESSOR);
             professor.setCpf("22222222222");
-            professor.setDepartamento("Computação");
+            professor.setDepartamento("Ciência da Computação");
             professor.setSaldoMoedas(1000);
-            professor.setInstituicao(inst);
-
+            professor.setInstituicao(instDefault);
             professorRepository.save(professor);
-            log.info("Professor de testes criado: {}", professorEmail);
-        } else {
-            log.info("Professor de testes já existe, ignorando seed.");
+            log.info("Professor de testes criado com sucesso.");
         }
     }
 }
