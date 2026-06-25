@@ -1,35 +1,28 @@
 package com.moedaestudantil;
 
-import com.moedaestudantil.model.Aluno;
-import com.moedaestudantil.model.Instituicao;
-import com.moedaestudantil.model.Professor;
-import com.moedaestudantil.model.Usuario;
-import com.moedaestudantil.repository.AlunoRepository;
-import com.moedaestudantil.repository.InstituicaoRepository;
-import com.moedaestudantil.repository.ProfessorRepository;
-import com.moedaestudantil.repository.UsuarioRepository;
+import com.moedaestudantil.model.*;
+import com.moedaestudantil.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+// Imports necessários para o Supplier e verificação de existência
+import java.util.function.Supplier;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
-    private static final String TEST_ALUNO_EMAIL = "aluno.teste@sistema.local";
 
     private final AlunoRepository alunoRepository;
     private final UsuarioRepository usuarioRepository;
     private final InstituicaoRepository instituicaoRepository;
     private final ProfessorRepository professorRepository;
 
-    public DataInitializer(AlunoRepository alunoRepository,
-                           UsuarioRepository usuarioRepository,
-                           InstituicaoRepository instituicaoRepository,
-                           ProfessorRepository professorRepository) {
+    public DataInitializer(AlunoRepository alunoRepository, UsuarioRepository usuarioRepository,
+                           InstituicaoRepository instituicaoRepository, ProfessorRepository professorRepository) {
         this.alunoRepository = alunoRepository;
         this.usuarioRepository = usuarioRepository;
         this.instituicaoRepository = instituicaoRepository;
@@ -37,57 +30,57 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     @Override
+    @Transactional
     public void run(String... args) {
-        // 1. Garantir que as Instituições existam
+        // 1. Instituições
         if (instituicaoRepository.count() == 0) {
-            Instituicao ufmg = new Instituicao();
-            ufmg.setNome("Universidade Federal de Minas Gerais (UFMG)");
-            instituicaoRepository.save(ufmg);
-
-            Instituicao puc = new Instituicao();
-            puc.setNome("Pontifícia Universidade Católica de Minas Gerais (PUC-MG)");
-            instituicaoRepository.save(puc);
-
-            Instituicao cefet = new Instituicao();
-            cefet.setNome("Centro Federal de Educação Tecnológica de Minas Gerais (CEFET-MG)");
-            instituicaoRepository.save(cefet);
-
-            log.info("Instituições padrão criadas com sucesso.");
+            instituicaoRepository.save(new Instituicao("Universidade Federal de Minas Gerais (UFMG)"));
+            instituicaoRepository.save(new Instituicao("Pontifícia Universidade Católica de Minas Gerais (PUC-MG)"));
+            instituicaoRepository.save(new Instituicao("Centro Federal de Educação Tecnológica de Minas Gerais (CEFET-MG)"));
+            log.info("Instituições criadas.");
         }
 
-        // Recupera a primeira instituição para usar nos testes
-        List<Instituicao> instituicoes = instituicaoRepository.findAll();
-        Instituicao instDefault = instituicoes.get(0);
+        Instituicao instDefault = instituicaoRepository.findAll().get(0);
 
-        // 2. Criação dos Alunos e Professor
-        if (!usuarioRepository.findByEmail(TEST_ALUNO_EMAIL).isPresent()) {
-            Aluno testAluno = new Aluno();
-            testAluno.setNome("Aluno de Testes");
-            testAluno.setEmail(TEST_ALUNO_EMAIL);
-            testAluno.setSenha("123456");
-            testAluno.setTipo(Usuario.TipoUsuario.ALUNO);
-            testAluno.setCpf("00000000000");
-            testAluno.setCurso("Engenharia de Software");
-            testAluno.setSaldoMoedas(9999);
-            testAluno.setInstituicao(instDefault);
-            testAluno.setIsTestUser(true);
-            alunoRepository.save(testAluno);
-            log.info("Aluno de testes 1 criado na instituição: {}", instDefault.getNome());
-        }
+        // 2. Criação dos usuários de teste (Usa o método auxiliar que criamos)
+        criarUsuarioSeNaoExistir("aluno.teste@sistema.local", "00000000000", () -> {
+            Aluno a = new Aluno();
+            a.setNome("Aluno de Testes");
+            a.setEmail("aluno.teste@sistema.local");
+            a.setSenha("123456");
+            a.setTipo(Usuario.TipoUsuario.ALUNO);
+            a.setCpf("00000000000");
+            a.setCurso("Engenharia");
+            a.setSaldoMoedas(9999);
+            a.setInstituicao(instDefault);
+            a.setIsTestUser(true);
+            return a;
+        });
 
-        String professorEmail = "professor.teste@teste.com";
-        if (!usuarioRepository.findByEmail(professorEmail).isPresent()) {
-            Professor professor = new Professor();
-            professor.setNome("Prof. Carlos Silva");
-            professor.setEmail(professorEmail);
-            professor.setSenha("123456");
-            professor.setTipo(Usuario.TipoUsuario.PROFESSOR);
-            professor.setCpf("22222222222");
-            professor.setDepartamento("Ciência da Computação");
-            professor.setSaldoMoedas(1000);
-            professor.setInstituicao(instDefault);
-            professorRepository.save(professor);
-            log.info("Professor de testes criado com sucesso.");
+        criarUsuarioSeNaoExistir("professor.teste@teste.com", "22222222222", () -> {
+            Professor p = new Professor();
+            p.setNome("Prof. Carlos Silva");
+            p.setEmail("professor.teste@teste.com");
+            p.setSenha("123456");
+            p.setTipo(Usuario.TipoUsuario.PROFESSOR);
+            p.setCpf("22222222222");
+            p.setDepartamento("Computação");
+            p.setSaldoMoedas(1000);
+            p.setInstituicao(instDefault);
+            return p;
+        });
+    }
+
+    private void criarUsuarioSeNaoExistir(String email, String cpf, Supplier<Usuario> creator) {
+        // Verifica se já existe por E-mail OU por CPF para evitar a violação de constraint
+        boolean existe = usuarioRepository.findByEmail(email).isPresent() ||
+                usuarioRepository.findByCpf(cpf).isPresent();
+
+        if (!existe) {
+            usuarioRepository.save(creator.get());
+            log.info("Usuário {} criado com sucesso.", email);
+        } else {
+            log.info("Usuário {} ou CPF {} já existe, ignorando seed.", email, cpf);
         }
     }
 }
