@@ -1,51 +1,69 @@
-@startuml Diagrama de Implantacao - Meritum_Enterprise
+@startuml Diagrama_de_Implantacao_Meritum_Refinado
 
 skinparam style strictuml
 skinparam componentStyle uml2
 
 skinparam node {
     BackgroundColor #F8F9FA
-    BorderColor #495057
+    BorderColor #343A40
 }
 
-node "Client Tier (Dispositivo do Usuário)" #FFFFFF {
-    component [Navegador Web / Mobile] as Browser
+actor "Usuário" as User
+
+node "Client Tier (Dispositivo)" #FFFFFF {
+    component "Navegador (Browser)" as Browser
 }
 
-node "Edge Delivery: Vercel (CDN)" #LightBlue {
-    artifact "SPA (React Bundle)" as SPA
-    interface "HTTP/HTTPS" as CDN_IF
+node "Edge Layer (Vercel CDN)" #LightBlue {
+    artifact "React SPA (JS/CSS)" as SPA
+    interface "HTTPS" as CDN_IF
 }
 
-node "Platform Tier: Render (Cloud PAAS)" #LightGreen {
-    node "Container Cluster (Backend)" {
-        component "Spring Boot API Service" as API
-        component "Resgate Background Worker" as Worker
+node "Application Layer (Render Cloud)" #LightGreen {
+
+    node "API Layer (Sync)" {
+        component "Spring Boot API" as API
     }
-    
-    node "Persistence Tier" {
-        database "PostgreSQL Managed Instance" as DB
-        note right of DB: Schema: \n- users\n- transactions\n- exchanges\n- coupons
+
+    node "Async Processing" {
+        component "Resgate Worker (Consumer)" as Worker
+    }
+
+    node "Persistence Layer" {
+        database "PostgreSQL" as DB
     }
 }
 
-node "Messaging Tier: CloudAMQP" #LightGray {
-    queue "vantagens.resgate.queue" as Fila
-    note top of Fila: RabbitMQ (AMQP 0.9.1)
+node "Messaging (CloudAMQP)" #LightGray {
+    queue "RabbitMQ Queue\n(vantagens.resgate.queue)" as Fila
 }
 
-node "External Service Integration" #F5F5F5 {
-    component "ViaCEP REST API" as ViaCEP
+node "External Services" #F5F5F5 {
+    component "ViaCEP API" as ViaCEP
 }
 
-Browser --> CDN_IF : Acesso (DNS/HTTPS)
-CDN_IF --> SPA : Serve estáticos
-SPA <--> API : REST/JSON (API Gateway)
-SPA --> ViaCEP : GET /ws/{cep}/json/
+node "Observability" #FFF3CD {
+    component "Logs / Monitoring" as Logs
+}
 
-API --> DB : JDBC (Pool de Conexão)
-API --> Fila : AMQPS (Producer)
-Fila --> Worker : Push Event/ACK (Consumer)
-Worker --> DB : JTA (Transaction)
+' --- RELAÇÕES ---
+
+User --> Browser : Usa aplicação
+
+Browser --> CDN_IF : HTTPS Request
+CDN_IF --> SPA : Entrega arquivos estáticos
+
+SPA --> API : REST (JSON)
+SPA --> ViaCEP : GET /cep
+
+API --> DB : JDBC / Connection Pool
+
+API --> Fila : Publish (AMQP)
+Fila --> Worker : Consume (RabbitMQ)
+
+Worker --> DB : Transações
+
+API --> Logs : Logs / Métricas
+Worker --> Logs : Logs / Métricas
 
 @enduml
