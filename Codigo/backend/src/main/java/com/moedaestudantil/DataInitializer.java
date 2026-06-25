@@ -35,7 +35,13 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        Instituicao inst = instituicaoRepository.findById(1L).orElse(null);
+            Instituicao inst = instituicaoRepository.findById(1L).orElse(null);
+            if (inst == null) {
+                inst = new Instituicao();
+                inst.setNome("Instituição de Teste"); // Ajuste conforme necessário
+                inst = instituicaoRepository.save(inst); // Agora inst tem um ID real
+                log.info("Instituição de teste criada automaticamente.");
+            }
 
         // 1. Criação do Primeiro Aluno de Teste (se não existir)
         if (!usuarioRepository.findByEmail(TEST_ALUNO_EMAIL).isPresent()) {
@@ -48,9 +54,9 @@ public class DataInitializer implements CommandLineRunner {
             testAluno.setCurso("Engenharia de Software");
             testAluno.setSaldoMoedas(9999);
             testAluno.setInstituicao(inst);
-            testAluno.setIsTestUser(true);
+            testAluno.setIsTestUser(true); // Definimos o flag ANTES de salvar
 
-            alunoRepository.save(testAluno);
+            alunoRepository.save(testAluno); // Apenas UMA chamada é suficiente
             log.info("Aluno de testes criado: {} | saldo: 9999 moedas", TEST_ALUNO_EMAIL);
         } else {
             log.info("Usuário de testes 1 já existe, ignorando seed.");
