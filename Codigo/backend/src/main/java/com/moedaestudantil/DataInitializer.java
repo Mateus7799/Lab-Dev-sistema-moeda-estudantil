@@ -72,15 +72,12 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void criarUsuarioSeNaoExistir(String email, String cpf, Supplier<Usuario> creator) {
-        // Verifica se já existe por E-mail OU por CPF para evitar a violação de constraint
-        boolean existe = usuarioRepository.findByEmail(email).isPresent() ||
-                usuarioRepository.findByCpf(cpf).isPresent();
-
-        if (!existe) {
+        // Verifica apenas pelo e-mail, que é o identificador principal do usuário
+        if (!usuarioRepository.findByEmail(email).isPresent()) {
             usuarioRepository.save(creator.get());
             log.info("Usuário {} criado com sucesso.", email);
         } else {
-            log.info("Usuário {} ou CPF {} já existe, ignorando seed.", email, cpf);
+            log.info("Usuário {} já existe, ignorando seed.", email);
         }
     }
 }

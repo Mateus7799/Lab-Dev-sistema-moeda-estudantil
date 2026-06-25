@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "instituicao")
 @Data
-@NoArgsConstructor
+@NoArgsConstructor 
 public class Instituicao {
 
     @Id
@@ -16,4 +16,8 @@ public class Instituicao {
 
     @Column(nullable = false)
     private String nome;
+
+    public Instituicao(String nome) {
+        this.nome = nome;
+    }
 }
